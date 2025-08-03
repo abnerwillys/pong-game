@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useBall } from "../../hooks/useBall";
 import { usePaddles } from "../../hooks/usePaddles";
 import { useGameLoop } from "../../hooks/useGameLoop";
@@ -7,10 +7,15 @@ import { useCanvasRenderer } from "../../hooks/useCanvasRenderer";
 import { ResetButton } from "../ResetButton";
 import { useInputTracker } from "../../hooks/useInputTracker";
 import { useGameReset } from "../../hooks/useGameReset";
+import { DebugBox } from "../DebugBox";
+import { DebugToggleButton } from "../DebugToggleButton";
 
 export const GameCanvas = () => {
   const keysPressed = useInputTracker();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [deltaTime, setDeltaTime] = useState(0);
+  const [isDebugVisible, setIsDebugVisible] = useState(false);
+
   const { paddles, handlePaddlesUpdate, handlePaddlesReset } = usePaddles({
     keysPressed,
   });
@@ -20,9 +25,18 @@ export const GameCanvas = () => {
     paddles,
   });
 
+  const handleDebugInfo = useCallback(() => {
+    if (keysPressed.current["d"]) {
+      setIsDebugVisible((prev) => !prev);
+      keysPressed.current["d"] = false;
+    }
+  }, [keysPressed]);
+
   useGameLoop((delta) => {
+    setDeltaTime(delta);
     handlePaddlesUpdate(delta);
     handleBallUpdate(delta);
+    handleDebugInfo();
   });
 
   useCanvasRenderer({ canvasRef, ball, paddles });
@@ -44,7 +58,19 @@ export const GameCanvas = () => {
         />
         <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
           <ResetButton onClick={handleResetGame} />
+          <DebugToggleButton
+            onClick={() => setIsDebugVisible((prev) => !prev)}
+            isActive={isDebugVisible}
+          />
         </div>
+        {isDebugVisible && (
+          <DebugBox
+            ball={ball}
+            paddles={paddles}
+            deltaTime={deltaTime}
+            keysPressed={keysPressed.current}
+          />
+        )}
       </div>
     </div>
   );
