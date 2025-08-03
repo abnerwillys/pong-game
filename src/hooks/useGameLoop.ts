@@ -1,3 +1,5 @@
+// src/hooks/useGameLoop.ts
+
 import { useEffect, useRef } from "react";
 
 export const useGameLoop = (callback: (delta: number) => void) => {

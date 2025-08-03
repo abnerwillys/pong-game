@@ -1,23 +1,22 @@
-# Notes – Make Labs Ping-Pong Game
+# Make Labs Ping-Pong Game
 
 This document contains incremental notes describing my thought process, design decisions, trade-offs, and what I would improve with more time.
 
 ---
 
-## ➡️  Step 1–2: Setup
+## ➡️ Step 1: Setup
 
 I chose **React + TypeScript + Vite** (besides to be the ask in the challenge instructions) for fast development, strong typing, and modern bundling. `Tailwind CSS` was added early to keep layout and styling consistent with the Make Labs stack. This setup offers strong developer experience and enables clean component structure.
 
 ---
 
-## ➡️ Step 3: Game Loop and Ball Movement 
+## ➡️ Step 2: Game Loop and Ball Movement 
+> ⚠️ **Note:** The implementation described in this step has since been refactored into modular hooks and utilities (see Step 5). This section documents the original logic before modularization for historical clarity.
 
 ### 🎯 Goal
-
 Create a smooth, frame-consistent ball animation inside a canvas.
 
 ### 🔹 Why I Used `requestAnimationFrame`
-
 I implemented a custom game loop using `requestAnimationFrame` to handle the ball movement. This method was chosen over alternatives like `setInterval` or `setTimeout` because:
 
 - It syncs with the browser's **refresh rate** (usually 60fps), providing smoother animations.
@@ -39,8 +38,6 @@ x += vx * delta
 
 This keeps physics simulation frame-rate independent, a common technique in both 2D and 3D games.
 
-If you're curious about this subject, like I was, you can take a brief look on this article: https://dev.to/dsaghliani/understanding-delta-time-in-games-3olf
-
 ### 🔹 Frame Independence
 This technique ensures consistent behavior whether the game is running at 30fps or 144fps. Without delta, faster devices would cause the ball and paddles to move faster than intended.
 
@@ -54,19 +51,26 @@ Canvas gives me full control over rendering, avoids layout reflows, and better m
 ### 🔹 Reusability
 The loop is abstracted into a useGameLoop hook to keep logic modular and testable, and make it easier to apply in other parts of the game (e.g., for paddles or AI movement).
 
+### 📚 Further Reading
+If you're curious about this subject, like I was, you can take a brief look on this article:
+
+- [Game Loop – Game Programming Patterns](https://gameprogrammingpatterns.com/game-loop.html)
+  - This article explains how to design a frame-consistent game loop using delta time, input polling, and update-render separation. It's a foundational technique used in most professional games and aligns with the architecture I used here.
+- [Delta time - Understanding delta time in games]( https://dev.to/dsaghliani/understanding-delta-time-in-games-3olf)
+  - A concise explanation of how delta time works, why it's important for consistent movement across devices, and how to implement it in simple games. Great for beginners or frontend devs transitioning into game mechanics.
+
 ---
 
-## ➡️ Step 4: Paddles and Player Controls
+## ➡️ Step 3: Paddles and Player Controls
+> ⚠️ **Note:** The implementation described in this step has since been refactored into modular hooks and utilities (see Step 5). This section documents the original logic before modularization for historical clarity.
 
 ### 🎯 Goal
-
 Render two paddles on the canvas and allow two players to control them simultaneously:
 
 - Player 1 (left paddle): `W` and `S`
 - Player 2 (right paddle): `ArrowUp` and `ArrowDown`
 
 ### 🔹 Keyboard Handling
-
 I implemented global `keydown` and `keyup` listeners to track which keys are being held down. Instead of reacting to individual events, I maintain an object (`keysPressed.current`) that keeps track of all active keys in real-time.
 
 This approach supports:
@@ -82,7 +86,6 @@ if (keysPressed.current["ArrowDown"]) rightY += speed * delta
 While global `keydown`/`keyup` handlers may seem broad, they're extremely lightweight and standard for games. Filtering key states in a ref (`keysPressed.current`) is far more efficient than using `useState` or rerendering on every keystroke.
 
 ### 🔹 Integration with Game Loop
-
 The paddle update logic runs inside the same requestAnimationFrame-powered useGameLoop:
 - It checks key states each frame
 - It applies movement scaled by delta
@@ -99,19 +102,18 @@ This model mirrors how games typically handle input:
 It avoids jerky movement or missed inputs and simplifies new features later (e.g. AI or touch control).
 
 ### 🔹 Diagram: Game Loop and Input Integration
-<img src="./docs/images/step4_diagram.png" alt="Game loop and paddle input diagram" width="350" />
+<img src="./docs/images/step3_diagram.png" alt="Game loop and paddle input diagram" width="350" />
 
 ---
 
-## ➡️ Step 5: Paddle Collision and Dynamic Bounce
+## ➡️ Step 4: Paddle Collision and Dynamic Bounce
+> ⚠️ **Note:** The implementation described in this step has since been refactored into modular hooks and utilities (see Step 5). This section documents the original logic before modularization for historical clarity.
 
 ### 🎯 Goal
-
 Detect when the ball hits either paddle and bounce it back. Additionally, add variation to the bounce angle based on where the ball strikes the paddle — creating a more dynamic and skill-based experience (making more 
 difficult to preview where the ball goes).
 
 ### 🔹 Collision Detection Logic
-
 To check if the ball intersects a paddle, I implemented a basic *AABB (Axis-Aligned Bounding Box)* collision check:
 ```ts
 const paddleCollision = (
@@ -130,7 +132,6 @@ const paddleCollision = (
 This is called once per frame for each paddle during the game loop.
 
 #### ↪️  Basic Bounce Behavior
-
 When a collision is detected, the ball's horizontal velocity is inverted:
 ```ts
 vx *= -1
@@ -138,7 +139,6 @@ vx *= -1
 To prevent the ball from sticking inside the paddle, I also slightly reposition the ball to just outside the collision boundary.
 
 #### ↪️  Angle Variation with Hit Point
-
 To make the gameplay feel more natural and responsive, I added vertical deflection based on _where_ the ball hits the paddle:
 ```ts
 const hitPoint = (ballY - (paddleY + paddleH / 2)) / (paddleH / 2)
@@ -157,8 +157,39 @@ This behavior gives the player a sense of agency over the ball's direction, turn
 
 ---
 
-## ➡️ Step 6: ??
-??
+## ➡️ Step 5: Architecture Refactor – Hooks, Utils & Constants
+
+### 🎯 Goal
+Reorganize the growing game logic into modular, testable units with clear responsibilities.
+
+### 🔹 Motivation
+As the game evolved, the GameCanvas component began handling too much logic — ball movement, collision detection, paddle state, and rendering. To improve clarity and scalability, I split responsibilities into dedicated hooks and utility files.
+
+### 🔹 What Was Done
+- `useBall` manages ball state and physics.
+- `usePaddles` tracks paddle positions and handles input.
+- `useGameLoop` provides a clean, reusable animation loop using `requestAnimationFrame`.
+- `useCanvasRenderer` handles low-level canvas rendering.
+- `useInputTracker` abstracts keyboard state tracking.
+- `physics.ts` centralizes pure utility logic: collision detection, bounce physics, wall interaction.
+- `constants.ts` defines all static game values in one place: sizes, speeds, offsets.
+- All variables use clear, descriptive names for better readability (e.g., `velocityX` instead of `vx`).
+
+### 🔹  Benefits
+- **Easier to reason about:** Each file does one thing well.
+- **Easier to test/debug:** Pure functions are now isolated.
+- **More reusable:** Game loop and canvas renderer could be reused across features (e.g. menus, animations).
+- **Cleaner component:** `GameCanvas` is now declarative and focused on composition, not logic.
+
+### 🔹 Diagram: Updated game flow after refactors
+<img src="./docs/images/step5_diagram.png" alt="Game loop and paddle input diagram refactoring" width="350" />
+
+This kind of modularization mirrors common architecture in game engines (e.g., Unity's component system, ECS patterns), promoting separation of concerns and testability.
+
+---
+
+## ➡️ Step 6: Enhancements and Features (In Progress)
+> Coming soon: scoring, difficulty, reset button, and visual polish
 
 ---
 
