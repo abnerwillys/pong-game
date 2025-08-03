@@ -6,11 +6,12 @@ import {
   CANVAS_HEIGHT,
 } from "../constants/config";
 import type { PaddlesT } from "../types";
-import { useInputTracker } from "./useInputTracker";
 
-export const usePaddles = () => {
-  const keysPressed = useInputTracker();
+interface IUsePaddlesParams {
+  keysPressed: React.RefObject<Record<string, boolean>>;
+}
 
+export const usePaddles = ({ keysPressed }: IUsePaddlesParams) => {
   const [paddles, setPaddles] = useState<PaddlesT>({
     leftY: 150,
     rightY: 150,
@@ -35,5 +36,13 @@ export const usePaddles = () => {
     });
   };
 
-  return { paddles, handlePaddlesUpdate };
+  const handlePaddlesReset = () => {
+    setPaddles((prev) => ({
+      ...prev,
+      leftY: (CANVAS_HEIGHT - prev.height) / 2,
+      rightY: (CANVAS_HEIGHT - prev.height) / 2,
+    }));
+  };
+
+  return { paddles, handlePaddlesUpdate, handlePaddlesReset };
 };

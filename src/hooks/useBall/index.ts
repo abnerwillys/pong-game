@@ -45,5 +45,14 @@ export const useBall = ({ canvasRef, paddles }: IUseBallParams) => {
     });
   };
 
-  return { ball, handleBallUpdate };
+  const handleBallReset = () => {
+    setBall({
+      x: CANVAS_WIDTH / 2,
+      y: CANVAS_HEIGHT / 2,
+      velocityX: BALL_INITIAL_SPEED_X,
+      velocityY: BALL_INITIAL_SPEED_Y,
+    });
+  };
+
+  return { ball, handleBallUpdate, handleBallReset };
 };
