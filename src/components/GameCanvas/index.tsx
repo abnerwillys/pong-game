@@ -1,6 +1,22 @@
 import { useRef, useState, useEffect } from "react";
 import { useGameLoop } from "../../hooks/useGameLoop";
 
+const paddleCollision = (
+  ballX: number,
+  ballY: number,
+  paddleX: number,
+  paddleY: number,
+  paddleW: number,
+  paddleH: number
+) => {
+  return (
+    ballX >= paddleX &&
+    ballX <= paddleX + paddleW &&
+    ballY >= paddleY &&
+    ballY <= paddleY + paddleH
+  );
+};
+
 export const GameCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -28,9 +44,43 @@ export const GameCanvas = () => {
       x += vx * delta;
       y += vy * delta;
 
-      // Bounce on edges
-      if (x <= 0 || x >= canvas.width) vx *= -1;
+      // Bounce on top/bottom walls
       if (y <= 0 || y >= canvas.height) vy *= -1;
+
+      // Paddle dimensions
+      const paddleW = paddles.width;
+      const paddleH = paddles.height;
+
+      // Left paddle collision
+      if (
+        vx < 0 &&
+        paddleCollision(x, y, 20, paddles.leftY, paddleW, paddleH)
+      ) {
+        vx *= -1;
+        x = 20 + paddleW; // prevent sticking
+
+        const hitPoint = (y - (paddles.leftY + paddleH / 2)) / (paddleH / 2);
+        vy += hitPoint * 0.3;
+      }
+
+      // Right paddle collision
+      if (
+        vx > 0 &&
+        paddleCollision(
+          x,
+          y,
+          canvas.width - 20 - paddleW,
+          paddles.rightY,
+          paddleW,
+          paddleH
+        )
+      ) {
+        vx *= -1;
+        x = canvas.width - 20 - paddleW; // prevent sticking
+
+        const hitPoint = (y - (paddles.rightY + paddleH / 2)) / (paddleH / 2);
+        vy += hitPoint * 0.3;
+      }
 
       return { x, y, vx, vy };
     });

@@ -6,7 +6,7 @@ This document contains incremental notes describing my thought process, design d
 
 ## ➡️  Step 1–2: Setup
 
-I chose **React + TypeScript + Vite** (besides to be the ask in the challenge instructions) for fast development, strong typing, and modern bundling. Tailwind CSS was added early to keep layout and styling consistent with the Make Labs stack. This setup offers strong developer experience and enables clean component structure.
+I chose **React + TypeScript + Vite** (besides to be the ask in the challenge instructions) for fast development, strong typing, and modern bundling. `Tailwind CSS` was added early to keep layout and styling consistent with the Make Labs stack. This setup offers strong developer experience and enables clean component structure.
 
 ---
 
@@ -24,6 +24,9 @@ I implemented a custom game loop using `requestAnimationFrame` to handle the bal
 - It **automatically pauses** when the user switches tabs, improving performance and battery life.
 - It avoids **frame drops and jitter** common with `setInterval`.
 
+### 🔹 Efficient Canvas Drawing
+Instead of redrawing on every frame inside `requestAnimationFrame`, I only redraw the canvas when the state updates (`ball`, `paddles`) via `useEffect`. Since state changes are triggered within the game loop, this approach keeps rendering fast while making React state observable and debug-friendly.
+
 ### 🔹 Delta Time
 
 I calculate the `delta` (time between frames) to ensure consistent movement across different devices and performance levels. Without `delta`, faster devices would make the ball move faster.
@@ -38,8 +41,15 @@ This keeps physics simulation frame-rate independent, a common technique in both
 
 If you're curious about this subject, like I was, you can take a brief look on this article: https://dev.to/dsaghliani/understanding-delta-time-in-games-3olf
 
+### 🔹 Frame Independence
+This technique ensures consistent behavior whether the game is running at 30fps or 144fps. Without delta, faster devices would cause the ball and paddles to move faster than intended.
+
 ### 🔹 Rendering
 Rendering is handled with the native HTML <canvas> using the 2D context. This gives me full pixel-level control while keeping performance high for a simple 2D game like Pong.
+
+
+### 🔹 Why `<canvas>` Instead of DOM Elements?
+Canvas gives me full control over rendering, avoids layout reflows, and better mimics real game environments. It's also more performant and scalable for game features like particles, effects, or possible Three.js animations later.
 
 ### 🔹 Reusability
 The loop is abstracted into a useGameLoop hook to keep logic modular and testable, and make it easier to apply in other parts of the game (e.g., for paddles or AI movement).
@@ -64,11 +74,12 @@ This approach supports:
 - Smooth and continuous movement while keys are held
 
 Example logic:
-
 ```ts
 if (keysPressed.current["w"]) leftY -= speed * delta
 if (keysPressed.current["ArrowDown"]) rightY += speed * delta
 ```
+
+While global `keydown`/`keyup` handlers may seem broad, they're extremely lightweight and standard for games. Filtering key states in a ref (`keysPressed.current`) is far more efficient than using `useState` or rerendering on every keystroke.
 
 ### 🔹 Integration with Game Loop
 
@@ -92,4 +103,67 @@ It avoids jerky movement or missed inputs and simplifies new features later (e.g
 
 ---
 
-## ➡️ Step 5: ??
+## ➡️ Step 5: Paddle Collision and Dynamic Bounce
+
+### 🎯 Goal
+
+Detect when the ball hits either paddle and bounce it back. Additionally, add variation to the bounce angle based on where the ball strikes the paddle — creating a more dynamic and skill-based experience (making more 
+difficult to preview where the ball goes).
+
+### 🔹 Collision Detection Logic
+
+To check if the ball intersects a paddle, I implemented a basic *AABB (Axis-Aligned Bounding Box)* collision check:
+```ts
+const paddleCollision = (
+  ballX, ballY,
+  paddleX, paddleY,
+  paddleW, paddleH
+) => {
+  return (
+    ballX >= paddleX &&
+    ballX <= paddleX + paddleW &&
+    ballY >= paddleY &&
+    ballY <= paddleY + paddleH
+  )
+}
+```
+This is called once per frame for each paddle during the game loop.
+
+#### ↪️  Basic Bounce Behavior
+
+When a collision is detected, the ball's horizontal velocity is inverted:
+```ts
+vx *= -1
+```
+To prevent the ball from sticking inside the paddle, I also slightly reposition the ball to just outside the collision boundary.
+
+#### ↪️  Angle Variation with Hit Point
+
+To make the gameplay feel more natural and responsive, I added vertical deflection based on _where_ the ball hits the paddle:
+```ts
+const hitPoint = (ballY - (paddleY + paddleH / 2)) / (paddleH / 2)
+vy += hitPoint * 0.3
+```
+- If the ball hits the center of the paddle → hitPoint = 0 → straight bounce
+- If the ball hits near the top → hitPoint = -1 → upward deflection
+- If the ball hits near the bottom → hitPoint = +1 → downward deflection
+
+This behavior gives the player a sense of agency over the ball's direction, turning paddle position into a strategy tool — just like real-life table tennis or air hockey. It’s a simple tweak that adds emergent depth.
+
+### 🔹 Outcome
+- Ball now bounces off paddles with dynamic angles
+- Makes gameplay feel less robotic and more skill-driven
+- Adds replayability and realism while maintaining clean logic
+
+---
+
+## ➡️ Step 6: ??
+??
+
+---
+
+## 🧾 Glossary
+
+- **AABB (Axis-Aligned Bounding Box):** A common and efficient collision detection method that compares object edges on the x and y axes.
+- **Delta Time:** The time elapsed between frames, used to keep movement consistent across devices.
+- **requestAnimationFrame:** A browser API to schedule animations synced to the screen refresh rate, typically 60fps.
