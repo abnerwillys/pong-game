@@ -4,13 +4,16 @@ import "./index.css";
 import App from "./App.tsx";
 import { GameSettingsProvider } from "./contexts/GameSettingsContext";
 import { InputTrackerProvider } from "./contexts/InputTrackerContext/index.tsx";
+import { GameStatsProvider } from "./contexts/GameStatsContext/index.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <InputTrackerProvider>
-      <GameSettingsProvider>
-        <App />
-      </GameSettingsProvider>
-    </InputTrackerProvider>
+    <GameStatsProvider>
+      <InputTrackerProvider>
+        <GameSettingsProvider>
+          <App />
+        </GameSettingsProvider>
+      </InputTrackerProvider>
+    </GameStatsProvider>
   </StrictMode>
 );
