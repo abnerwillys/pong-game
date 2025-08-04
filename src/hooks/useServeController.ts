@@ -15,24 +15,29 @@ export const useServeController = ({
   resumeBall,
   handleBallReset,
 }: IUseServeControllerParams) => {
+  const [serveTo, setServeTo] = useState<PlayerSideT>("right");
   const [isOverlayVisible, setIsOverlayVisible] = useState(true);
   const [label, setLabel] = useState<ServeLabelT>("Start");
   const [countdown, setCountdown] = useState<CountdownT>(null);
   const isCountingRef = useRef(false);
 
-  /* Call on initial mount to present "Start" */
+  /* Call on initial mount(or in future after the game ends) to present "Start" */
   const handleOpenForInitialStart = useCallback(() => {
     pauseBall();
     handleBallReset("right");
+    setServeTo("right");
     setLabel("Start");
     setIsOverlayVisible(true);
   }, [handleBallReset, pauseBall]);
 
   /* Call after a score to present "Next Turn" */
   const handleOpenForNextTurn = useCallback(() => {
+    const next: PlayerSideT = Math.random() < 0.5 ? "left" : "right";
+    handleBallReset(next);
+    setServeTo(next);
     setLabel("Next Turn");
     setIsOverlayVisible(true);
-  }, []);
+  }, [handleBallReset]);
 
   const handleBeginCountdown = useCallback(() => {
     if (isCountingRef.current) return;
@@ -80,6 +85,7 @@ export const useServeController = ({
     isOverlayVisible,
     label,
     countdown,
+    serveTo,
     handleBeginCountdown,
     handleBeginCountdownByShortcut,
     handleOpenForInitialStart,

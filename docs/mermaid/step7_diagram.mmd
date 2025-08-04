@@ -1,0 +1,43 @@
+%% https://www.mermaidchart.com/play#pako:eNptU8tuEzEU_RUTltDySKFtKiGFRq0qHq3asppk4Xiuk1Ede7A9CQWxZYuExJrfgN_hB-ATuL72uJOQTca-Pufccx_51BOmhN6gN7O8nrPr0Vgzdjk8KSy8b8D5oa4W3FdGn1i-gAnb2XnBXhtTF42DU4yEM1tVfs5KUJ5PxjoIuGYa9ca9vz--__rz8ys703Xj2bXl4gYsOzbawwc_7gU0w8fKv4JbV5wqM-WK3cBtaVb6EX6bmqnKedBg3WQdTWaIhmZIv5X__eVb0HAXFpyDknigy2iOLLfUEMhab8wSLnhZKiDJdGRNXXIPMXvGXs2N9aLxru1EDjAuQsMi_i5KJPC-0jOsMxDShXkzmynYjrdLGEa5kIfuoXfWKAV213lu_bFptA_tmmzUF8p5yZUKzPBdK6RTa0zl8akt3oFnNZ2ZC_HMIJkMJ_GAnYZwi6QyOmqEH1m-6rT2mOsld5c4E7A4rxJfXcqY-tDqZ3ZbyVZqMJBSr9kcgQfhr4SxULjwi2saIthQZnAfjWRTbF8Zk3bQxH5H_Yrsdsroy-3OuUan9HCmhYUFaE8KHQYpZEpa-GIzwJYVZ13trTK4FSua_bYliGbOa9Anxr5FzevGtruQibGes_MlWMVvC4qlC3MIcky0a8QesBrD2NtKSxOn0dlDUroE1yzi_C0d4wpgV0_P76XcdxiihH_tUOOiFxYNm0X1EUKo4oqiiSQUd24EEu3E_shKqcF9CbIv9h86rPkG8MqFePLsaIOwqI3GQSQKPJZPJWRK_2BayoN1ijKzSrQZBOzLfoaD2Ds4PFyHh1Vr0X25J59n9KHgfS6PYgmbIx4MBqmY8Pr_APGdjORGp7kQL9WUmOu7j4BgKb3ltN18vc__AL-LHwQ
+
+graph TD
+  RAF[requestAnimationFrame] --> Loop[useGameLoop with delta]
+
+  subgraph "🕹️ Input Tracker Context"
+    InitKeys[Global keydown/keyup listeners]
+    InitKeys --> Keys[useInputTracker → keysPressed]
+  end
+
+  Loop --> Keys
+  Keys --> MovePaddles[usePaddles updates]
+  Keys --> Shortcuts[useGameShortcuts actions]
+  Shortcuts --> Settings[GameSettings toggles]
+  Shortcuts --> ServeActions[useServeController.startCountdown]
+
+  Loop --> MoveBall[useBall updates]
+  MovePaddles --> StatePaddles[set paddle state]
+  MoveBall --> StateBall[set ball state]
+
+  StatePaddles --> DrawPaddles[useCanvasRenderer draws paddles]
+  StateBall --> DrawBall[useCanvasRenderer draws ball]
+
+  MoveBall --> DetectScore[score detection out of bounds]
+  DetectScore --> UpdateScore[useGameStats.handleScoreIncrement]
+  UpdateScore --> GameStatsContext[GameStatsContext via useGameStats]
+  UpdateScore --> ShowServe[useServeController.handleOpenForNextTurn]
+
+  ShowServe --> UIOverlay[ServeOverlay shows countdown + player info]
+  ServeActions --> ResumeBall[resume ball on GO!]
+
+  ResumeBall --> InitAngle[randomizeInitialAngle]
+
+  classDef context fill:#fef3c7,stroke:#facc15;
+  classDef component fill:#e0f2fe,stroke:#38bdf8;
+  classDef logic fill:#fce7f3,stroke:#ec4899;
+  classDef draw fill:#f3f4f6,stroke:#9ca3af;
+
+  GameStatsContext:::context
+  useServeController:::logic
+  ServeOverlay:::component
+  useCanvasRenderer:::draw
+  useGameStats:::context

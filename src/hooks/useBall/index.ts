@@ -16,12 +16,24 @@ interface IUseBallParams {
   onScore: (side: PlayerSideT) => void;
 }
 
-const resetBallState = (serveTo: PlayerSideT): BallT => ({
-  x: CANVAS_WIDTH / 2,
-  y: CANVAS_HEIGHT / 2,
-  velocityX: serveTo === "left" ? -BALL_INITIAL_SPEED_X : BALL_INITIAL_SPEED_X,
-  velocityY: BALL_INITIAL_SPEED_Y,
-});
+const resetBallState = (serveTo: PlayerSideT): BallT => {
+  const angleDeg = Math.random() * 60 - 30; /* -30° to +30° */
+  const angleRad = (angleDeg * Math.PI) / 180;
+  const speed = BALL_INITIAL_SPEED_X;
+
+  const velocityX =
+    serveTo === "left"
+      ? -Math.abs(Math.cos(angleRad) * speed)
+      : Math.abs(Math.cos(angleRad) * speed);
+  const velocityY = Math.sin(angleRad) * BALL_INITIAL_SPEED_Y;
+
+  return {
+    x: CANVAS_WIDTH / 2,
+    y: CANVAS_HEIGHT / 2,
+    velocityX,
+    velocityY,
+  };
+};
 
 const serveTowardConcedingSide = (scorer: PlayerSideT): PlayerSideT =>
   scorer === "right" ? "left" : "right";

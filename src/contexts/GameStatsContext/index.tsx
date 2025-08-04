@@ -11,8 +11,8 @@ export type PlayerSideT = "left" | "right";
 
 interface IGameStatsContextData {
   score: { left: number; right: number };
-  incrementScore: (side: PlayerSideT) => void;
-  resetScore: () => void;
+  handleScoreIncrement: (side: PlayerSideT) => void;
+  handleScoreReset: () => void;
 }
 
 const GameStatsContext = createContext<IGameStatsContextData | null>(null);
@@ -20,18 +20,21 @@ const GameStatsContext = createContext<IGameStatsContextData | null>(null);
 export const GameStatsProvider = ({ children }: { children: ReactNode }) => {
   const [score, setScore] = useState({ left: 0, right: 0 });
 
-  const incrementScore = useCallback((side: PlayerSideT) => {
+  const handleScoreIncrement = useCallback((side: PlayerSideT) => {
     setScore((prev) => ({
       ...prev,
       [side]: prev[side] + 1,
     }));
   }, []);
 
-  const resetScore = useCallback(() => setScore({ left: 0, right: 0 }), []);
+  const handleScoreReset = useCallback(
+    () => setScore({ left: 0, right: 0 }),
+    []
+  );
 
   const value = useMemo(
-    () => ({ score, incrementScore, resetScore }),
-    [incrementScore, resetScore, score]
+    () => ({ score, handleScoreIncrement, handleScoreReset }),
+    [handleScoreIncrement, handleScoreReset, score]
   );
 
   return (

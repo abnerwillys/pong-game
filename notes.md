@@ -264,8 +264,75 @@ This kind of modularization mirrors common architecture in game engines (e.g., U
 
 ---
 
-## ➡️ Step 7: 
-??
+## ➡️ Step 7: Game Flow – Score System, Countdown, Dynamic Serve & Realistic Starts
+
+### 🎯 
+Transition from a technical demo to a full game loop with:
+- **Score tracking** per player
+- **Serve overlay** with countdown animation
+- **Randomized serving side** after each goal
+- **Randomized serve angles** for realism and variation
+
+### 🔹 Score Logic & Win Detection (in progress)
+The game now tracks and displays the score for each player:
+- Scoring occurs when the ball crosses the left or right bounds.
+- Scores are updated using a centralized `GameStatsContext`.
+- `onScore` logic handles game pause, serve reset, and UI feedback.
+
+While win detection is planned, the current system enables real-time score updates and will be reused for later win-state handling.
+
+### 🔹 Countdown Animation Overlay
+Before each round starts (either on game load or after a goal), a **visual countdown** overlays the canvas:
+- Countdowns display `3 → 2 → 1 → GO!` using the `<NumberFlow />` animation component and a spring-scale entry.
+- During countdown, the ball is paused and centered.
+- Players can trigger the countdown via keyboard shortcut (`'Enter'` key). This was implemented using the previous `useGameShortcuts()` solution.
+
+This provides anticipation, pacing, and prevents the game from restarting instantly, giving both players a fair start.
+
+### 🔹 Dynamic Serving Side
+After each point, the side that serves is **randomly chosen**:
+```ts
+const next = Math.random() < 0.5 ? "left" : "right"
+handleBallReset(next)
+```
+- This mimics real-life unpredictability and breaks the deterministic rhythm.
+- The serve direction is reflected in the `ServeOverlay`, along with icons and labels like:
+  - `Serving: Player 1 ==>`
+  - `<== Serving: Player 2`
+
+It adds idea of strategy and anticipation between rounds.
+
+### 🔹 Realistic Initial Serve Angles
+To avoid robotic and repetitive bounces, the ball’s initial angle is randomized at the start of each round:
+
+```ts
+  const angleDeg = Math.random() * 60 - 30; /* -30° to +30° */
+```
+- This angle affects both `velocityX` and `velocityY`, creating curved, natural trajectories.
+- Combined with dynamic bounce physics, it brings replayability and skill expression.
+- Serve direction (`left` or `right`) still determines horizontal polarity of the velocity.
+
+### 🔹 Technical Overview
+- `useBall` handles ball state, scoring, and randomized angle generation.
+- `useServeController` controls game pause, countdown, and state transitions.
+- `ServeOverlay` reflects who’s serving and when the game will resume.
+- `GameStatsContext` manages the global score state (`left` and `right`), provides `handleScoreIncrement()` and `handleScoreReset()` methods, 
+and ensures consistent score display across the app.
+
+Each responsibility is cleanly split into modular hooks, context providers, and UI components, enabling clear separation of concerns, easier debugging, and scalable expansion (e.g., win detection, stats tracking).
+
+Each responsibility is cleanly split into reusable hooks for clarity and testing.
+
+### 🔹 UX Outcome
+- **Score visibility** adds competitive context.
+- **Countdowns** make pacing player-friendly.
+- **Randomized serves** improve fairness.
+- **Angle variation** adds realism and engagement.
+
+Together, these changes elevate the game from a physics sandbox into a structured, competitive two-player experience. At least this is the idea :)
+
+### 🔹 Diagram updated
+<img src="./docs/images/step7_diagram.png" alt="Game loop and paddle input diagram" width="700" />
 
 ---
 

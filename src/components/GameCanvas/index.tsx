@@ -16,7 +16,7 @@ import { useServeController } from "@/hooks/useServeController";
 import { ServeOverlay } from "../ServeOverlay";
 
 export const GameCanvas = () => {
-  const { incrementScore } = useGameStats();
+  const { handleScoreIncrement, handleScoreReset } = useGameStats();
   const { isDebugInfoVisible } = useGameSettings();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -29,7 +29,7 @@ export const GameCanvas = () => {
       canvasRef,
       paddles,
       onScore: (side) => {
-        incrementScore(side);
+        handleScoreIncrement(side);
         /* useBall already paused & centered toward conceding side. */
         handleOpenForNextTurn();
       },
@@ -39,6 +39,7 @@ export const GameCanvas = () => {
     isOverlayVisible,
     label,
     countdown,
+    serveTo,
     handleBeginCountdown,
     handleBeginCountdownByShortcut,
     handleOpenForInitialStart,
@@ -46,8 +47,10 @@ export const GameCanvas = () => {
   } = useServeController({ pauseBall, resumeBall, handleBallReset });
 
   const { handleResetGame } = useGameReset({
+    handleOpenForInitialStart,
     handlePaddlesReset,
     handleBallReset,
+    handleScoreReset,
   });
 
   useEffect(() => {
@@ -82,6 +85,7 @@ export const GameCanvas = () => {
           visible={isOverlayVisible}
           label={label}
           countdown={countdown}
+          serveTo={serveTo}
           onStart={handleBeginCountdown}
         />
 
