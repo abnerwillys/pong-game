@@ -51,7 +51,7 @@ export const useBall = ({ canvasRef, paddles, onScore }: IUseBallParams) => {
 
   const handleBallUpdate = useCallback(
     (delta: number) => {
-      if (isPausedRef.current) return;
+      if (isPausedRef.current || hasScoredRef.current) return;
 
       setBall((prevBall) => {
         const canvas = canvasRef.current;

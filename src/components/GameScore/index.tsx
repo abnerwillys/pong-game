@@ -5,7 +5,7 @@ export const GameScore = () => {
   const { score } = useGameStats();
 
   return (
-    <div className="flex justify-center items-center text-white text-3xl font-bold mb-4">
+    <div className="flex justify-center items-center text-white text-6xl font-bold mb-4">
       <span className="mr-3">
         <NumberFlow value={score.left} />
       </span>

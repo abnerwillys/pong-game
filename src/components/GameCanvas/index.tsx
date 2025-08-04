@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useBall } from "@/hooks/useBall";
 import { usePaddles } from "@/hooks/usePaddles";
 import { useGameLoop } from "@/hooks/useGameLoop";
@@ -12,6 +12,8 @@ import { useGameSettings } from "@/contexts/GameSettingsContext";
 import { useGameShortcuts } from "@/hooks/useGameShortcuts";
 import { GameScore } from "../GameScore";
 import { useGameStats } from "@/contexts/GameStatsContext";
+import { useServeController } from "@/hooks/useServeController";
+import { ServeOverlay } from "../ServeOverlay";
 
 export const GameCanvas = () => {
   const { incrementScore } = useGameStats();
@@ -22,22 +24,36 @@ export const GameCanvas = () => {
 
   const { paddles, handlePaddlesUpdate, handlePaddlesReset } = usePaddles();
 
-  const { ball, handleBallUpdate, handleBallReset, resumeBall } = useBall({
-    canvasRef,
-    paddles,
-    onScore: (side) => {
-      incrementScore(side);
-      /* Pause & center already done inside useBall effect. */
-      setTimeout(() => {
-        resumeBall(); /* after 3s countdown UI */
-      }, 3000);
-    },
-  });
+  const { ball, handleBallUpdate, handleBallReset, pauseBall, resumeBall } =
+    useBall({
+      canvasRef,
+      paddles,
+      onScore: (side) => {
+        incrementScore(side);
+        /* useBall already paused & centered toward conceding side. */
+        handleOpenForNextTurn();
+      },
+    });
+
+  const {
+    isOverlayVisible,
+    label,
+    countdown,
+    handleBeginCountdown,
+    handleBeginCountdownByShortcut,
+    handleOpenForInitialStart,
+    handleOpenForNextTurn,
+  } = useServeController({ pauseBall, resumeBall, handleBallReset });
 
   const { handleResetGame } = useGameReset({
     handlePaddlesReset,
     handleBallReset,
   });
+
+  useEffect(() => {
+    /* On first render: ServeOverlay opens with 'Start', ball paused & centered */
+    handleOpenForInitialStart();
+  }, [handleOpenForInitialStart]);
 
   useGameLoop((delta) => {
     setDeltaTime(delta);
@@ -46,7 +62,7 @@ export const GameCanvas = () => {
   });
 
   useCanvasRenderer({ canvasRef, ball, paddles });
-  useGameShortcuts({ handleResetGame });
+  useGameShortcuts({ handleResetGame, handleBeginCountdownByShortcut });
 
   return (
     <div className="flex justify-center items-center h-full w-full">
@@ -61,6 +77,13 @@ export const GameCanvas = () => {
         {isDebugInfoVisible && (
           <DebugBox ball={ball} paddles={paddles} deltaTime={deltaTime} />
         )}
+
+        <ServeOverlay
+          visible={isOverlayVisible}
+          label={label}
+          countdown={countdown}
+          onStart={handleBeginCountdown}
+        />
 
         <canvas
           ref={canvasRef}

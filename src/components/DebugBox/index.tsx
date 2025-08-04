@@ -19,7 +19,7 @@ export const DebugBox = ({ ball, paddles, deltaTime }: IDebugBoxProps) => {
       <div className="mb-2">
         <div>⌨️ Keys Pressed:</div>
         <div className="ml-2 break-all">
-          {Object.entries(keysPressed)
+          {Object.entries(keysPressed.current ?? {})
             .filter(([, v]) => v)
             .map(([k]) => k)
             .join(", ") || "None"}

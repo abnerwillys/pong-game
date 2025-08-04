@@ -16,6 +16,7 @@ export const SHORTCUT_KEYS = {
   BALL_TRAIL: "t",
   DYNAMIC_BOUNCE: "b",
   DEBUG_INFO: "d",
+  START_SERVE: "enter",
 } as const;
 
 export type ShortcutKeyT = (typeof SHORTCUT_KEYS)[keyof typeof SHORTCUT_KEYS];

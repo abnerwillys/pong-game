@@ -3,14 +3,25 @@ import { useInputTracker } from "@/contexts/InputTrackerContext";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
 import { SHORTCUT_KEYS, type ShortcutKeyT } from "@/constants/shortcuts";
 
+/** Avoid toggles triggering when a text field (or other input) is focused for some reason. */
+const preventKeyEvents = () => {
+  return (
+    document.activeElement &&
+    document.activeElement instanceof HTMLElement &&
+    document.activeElement.isContentEditable
+  );
+};
+
 type ShortcutEntryT = { key: ShortcutKeyT; action: () => void };
 
 interface IUseGameShortcutsParams {
   handleResetGame: () => void;
+  handleBeginCountdownByShortcut: () => void;
 }
 
 export const useGameShortcuts = ({
   handleResetGame,
+  handleBeginCountdownByShortcut,
 }: IUseGameShortcutsParams) => {
   const keysPressed = useInputTracker();
   const {
@@ -38,11 +49,14 @@ export const useGameShortcuts = ({
       key: SHORTCUT_KEYS.DEBUG_INFO,
       action: () => setIsDebugInfoVisible((prev) => !prev),
     },
+    {
+      key: SHORTCUT_KEYS.START_SERVE,
+      action: () => handleBeginCountdownByShortcut(),
+    },
   ];
 
   useGameLoop(() => {
-    /* Avoid toggles triggering when a text field (or other input) is focused for some reason. */
-    if (document.activeElement?.tagName === "INPUT") return;
+    if (preventKeyEvents()) return;
 
     for (const { key, action } of shortcutMap) {
       if (keysPressed.current[key]) {
