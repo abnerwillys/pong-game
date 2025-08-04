@@ -16,7 +16,7 @@ interface IUseBallParams {
   onScore: (side: PlayerSideT) => void;
 }
 
-const resetBallState = (serveTo: PlayerSideT): BallT => {
+const handleBallStateReset = (serveTo: PlayerSideT): BallT => {
   const angleDeg = Math.random() * 60 - 30; /* -30° to +30° */
   const angleRad = (angleDeg * Math.PI) / 180;
   const speed = BALL_INITIAL_SPEED_X;
@@ -41,7 +41,7 @@ const serveTowardConcedingSide = (scorer: PlayerSideT): PlayerSideT =>
 export const useBall = ({ canvasRef, paddles, onScore }: IUseBallParams) => {
   const { isDynamicBounceEnabled } = useGameSettings();
 
-  const [ball, setBall] = useState<BallT>(resetBallState("right"));
+  const [ball, setBall] = useState<BallT>(handleBallStateReset("right"));
 
   const isPausedRef = useRef(false);
   const hasScoredRef = useRef(false);
@@ -58,7 +58,7 @@ export const useBall = ({ canvasRef, paddles, onScore }: IUseBallParams) => {
   const handleBallReset = useCallback((serveTo: PlayerSideT = "right") => {
     hasScoredRef.current = false;
     scoredSideRef.current = null;
-    setBall(resetBallState(serveTo));
+    setBall(handleBallStateReset(serveTo));
   }, []);
 
   const handleBallUpdate = useCallback(

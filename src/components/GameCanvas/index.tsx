@@ -1,23 +1,27 @@
 import { useEffect, useRef, useState } from "react";
+
+import { useGameStats } from "@/contexts/GameStatsContext";
+import { useGameSettings } from "@/contexts/GameSettingsContext";
+
 import { useBall } from "@/hooks/useBall";
 import { usePaddles } from "@/hooks/usePaddles";
 import { useGameLoop } from "@/hooks/useGameLoop";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/constants/config";
 import { useCanvasRenderer } from "@/hooks/useCanvasRenderer";
 import { useGameReset } from "@/hooks/useGameReset";
+import { useGameShortcuts } from "@/hooks/useGameShortcuts";
+import { useServeController } from "@/hooks/useServeController";
+import { useBallTrail } from "@/hooks/useBallTrail";
+
+import { GameScore } from "../GameScore";
 import { DebugBox } from "../DebugBox";
 import { ResetButton } from "../ResetButton";
 import { SettingsDropdown } from "../SettingsDropdown";
-import { useGameSettings } from "@/contexts/GameSettingsContext";
-import { useGameShortcuts } from "@/hooks/useGameShortcuts";
-import { GameScore } from "../GameScore";
-import { useGameStats } from "@/contexts/GameStatsContext";
-import { useServeController } from "@/hooks/useServeController";
 import { ServeOverlay } from "../ServeOverlay";
 
 export const GameCanvas = () => {
   const { handleScoreIncrement, handleScoreReset } = useGameStats();
-  const { isDebugInfoVisible } = useGameSettings();
+  const { isDebugInfoVisible, isBallTrailEnabled } = useGameSettings();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [deltaTime, setDeltaTime] = useState(0);
@@ -32,8 +36,14 @@ export const GameCanvas = () => {
         handleScoreIncrement(side);
         /* useBall already paused & centered toward conceding side. */
         handleOpenForNextTurn();
+        handleBallTrailReset();
       },
     });
+
+  const { ballTrailRef, handleBallTrailReset } = useBallTrail(
+    ball,
+    isBallTrailEnabled
+  );
 
   const {
     isOverlayVisible,
@@ -48,8 +58,12 @@ export const GameCanvas = () => {
 
   const { handleResetGame } = useGameReset({
     handleOpenForInitialStart,
+    handleBallReset: (...args) => {
+      /* Certify that clear trail only if ball resets. */
+      handleBallTrailReset();
+      handleBallReset(...args);
+    },
     handlePaddlesReset,
-    handleBallReset,
     handleScoreReset,
   });
 
@@ -64,7 +78,7 @@ export const GameCanvas = () => {
     handleBallUpdate(delta);
   });
 
-  useCanvasRenderer({ canvasRef, ball, paddles });
+  useCanvasRenderer({ canvasRef, ball, ballTrailRef, paddles });
   useGameShortcuts({ handleResetGame, handleBeginCountdownByShortcut });
 
   return (

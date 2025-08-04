@@ -2,26 +2,26 @@ import { useCallback } from "react";
 
 interface IUseGameResetParams {
   handleOpenForInitialStart: () => void;
-  handlePaddlesReset: () => void;
   handleBallReset: () => void;
+  handlePaddlesReset: () => void;
   handleScoreReset: () => void;
 }
 
 export const useGameReset = ({
   handleOpenForInitialStart,
-  handlePaddlesReset,
   handleBallReset,
+  handlePaddlesReset,
   handleScoreReset,
 }: IUseGameResetParams) => {
   const handleResetGame = useCallback(() => {
     handleOpenForInitialStart();
-    handlePaddlesReset();
     handleBallReset();
+    handlePaddlesReset();
     handleScoreReset();
   }, [
     handleOpenForInitialStart,
-    handlePaddlesReset,
     handleBallReset,
+    handlePaddlesReset,
     handleScoreReset,
   ]);
 

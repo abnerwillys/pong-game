@@ -24,9 +24,10 @@ const GameSettingsContext = createContext<IGameSettingsContextData | null>(
 
 export const GameSettingsProvider = ({ children }: { children: ReactNode }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isDebugInfoVisible, setIsDebugInfoVisible] = useState(false);
-  const [isBallTrailEnabled, setIsBallTrailEnabled] = useState(false);
+
+  const [isBallTrailEnabled, setIsBallTrailEnabled] = useState(true);
   const [isDynamicBounceEnabled, setIsDynamicBounceEnabled] = useState(true);
+  const [isDebugInfoVisible, setIsDebugInfoVisible] = useState(false);
 
   const value = useMemo(
     () => ({
