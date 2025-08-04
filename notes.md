@@ -139,6 +139,8 @@ vx *= -1
 To prevent the ball from sticking inside the paddle, I also slightly reposition the ball to just outside the collision boundary.
 
 #### ↪️  Angle Variation with Hit Point
+> ⚠️ **Note:** The implementation described in this sub-heading has since been refactored (see Step 6). This section documents the original logic before modularization for historical clarity. On Step 6, it's called `DynamicAngleBounce` and can be toggled for better interviewer testing.
+
 To make the gameplay feel more natural and responsive, I added vertical deflection based on _where_ the ball hits the paddle:
 ```ts
 const hitPoint = (ballY - (paddleY + paddleH / 2)) / (paddleH / 2)
@@ -188,8 +190,82 @@ This kind of modularization mirrors common architecture in game engines (e.g., U
 
 ---
 
-## ➡️ Step 6: Enhancements and Features (In Progress)
-> Coming soon: scoring, difficulty, reset button, and visual polish
+## ➡️ Step 6: Enhancements and Shortcuts
+
+### 🎯 Goal
+Introduce user-facing enhancements and keyboard shortcuts for improved gameplay experience and developer testing.
+
+### 🔹 Reset Button
+A `<ResetButton />` was added to allow restarting the game mid-session. This action resets:
+- Ball position and direction
+- Paddle positions
+
+### 🔹 Settings Menu
+A `<SettingsDropdown />` component was introduced to toggle advanced options:
+- Show/Hide Ball Trail (to be implemented)
+- Enable/Disable Dynamic Bounce
+- Show Debug Info Box
+
+The settings UI uses `z-index` layering and absolute positioning within the canvas wrapper.
+
+### 🔹 Game Settings Context
+All configuration toggles are managed via a global `GameSettingsContext`. It exposes and controls state like:
+- `isSettingsOpen`
+- `isDebugInfoVisible`
+- `isBallTrailEnabled`
+- `isDynamicBounceEnabled`
+
+This context centralizes UI and logic concerns, allowing both keyboard shortcuts and UI components to stay in sync.
+
+### 🔹 Migration from Hook to Context: useInputTracker
+I initially handled keyboard input using a combination of `useInputTracker`(as a hook, for keydown/keyup register) and `useDebouncedKeyPress`(for debouncing). In this step, I replaced it with a context-based `InputTrackerContext` to simplify the architecture and improve consistency.
+
+This refactor offers:
+- **Global access** to key state without setting up listeners in every hook.
+- **Frame-based polling** that fits naturally into the `useGameLoop`.
+- **Cleaner separation of concerns**, keeping input logic isolated and shared.
+
+While not strictly necessary for a small game, this change mirrors patterns used in larger apps and improves reusability and maintainability even in simpler projects.
+
+### 🔹 UI Components with `shadcn/ui`
+To maintain consistency with Tailwind CSS and reduce boilerplate, I used [shadcn/ui](https://ui.shadcn.com/) for interactive elements like:
+- `<Switch />` components in the settings menu
+- Toggle buttons and dropdowns
+
+This library provides accessible, headless UI primitives styled with Tailwind, which fit naturally into the project’s tech stack and visual style. It also allows for easy customization without losing design coherence.
+
+### 🔹  Keyboard Shortcuts
+Instead of listening for keyboard input directly in each feature, I introduced a reusable system:
+- `useInputTracker` listens to global keydown/keyup and stores active keys in a ref.
+- `useGameShortcuts` polls keys per frame inside the game loop and maps actions to keys.
+
+This ensures:
+- Each frame, keys are polled inside the game loop and manually debounced to ensure a single action per press.
+- Scalable and declarative shortcut registration via `shortcutMap`
+
+Current shortcuts:
+| Key | Action |
+| :--- | :--- |
+| ` r ` | Reset game |
+| ` z ` | Toggle settings menu |
+| ` t ` | Toggle ball trail |
+| ` b ` | Toggle dynamic bounce |
+| ` d ` | Toggle debug info |
+
+All shortcuts are lowercase, and mappings are defined in a centralized `constants/shortcuts.ts` file.
+
+Future: Additional shortcuts (e.g., speed multiplier, pause, or AI mode) can be added declaratively via the existing `shortcutMap` in `useGameShortcuts`.
+
+### 🔹 Diagram: Updated game flow after enhancements
+<img src="./docs/images/step6_diagram.png" alt="Game loop and paddle input diagram enhancements" width="450" />
+
+This kind of modularization mirrors common architecture in game engines (e.g., Unity's component system, ECS patterns), promoting separation of concerns and testability.
+
+
+---
+
+## ➡️ Step 7: 
+??
 
 ---
 
@@ -198,3 +274,4 @@ This kind of modularization mirrors common architecture in game engines (e.g., U
 - **AABB (Axis-Aligned Bounding Box):** A common and efficient collision detection method that compares object edges on the x and y axes.
 - **Delta Time:** The time elapsed between frames, used to keep movement consistent across devices.
 - **requestAnimationFrame:** A browser API to schedule animations synced to the screen refresh rate, typically 60fps.
+

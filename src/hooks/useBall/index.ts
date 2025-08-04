@@ -7,6 +7,7 @@ import {
   CANVAS_HEIGHT,
 } from "../../constants/config";
 import { verifyPaddlesCollision, verifyWallCollision } from "./physics";
+import { useGameSettings } from "@/contexts/GameSettingsContext";
 
 interface IUseBallParams {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -14,6 +15,8 @@ interface IUseBallParams {
 }
 
 export const useBall = ({ canvasRef, paddles }: IUseBallParams) => {
+  const { isDynamicBounceEnabled } = useGameSettings();
+
   const [ball, setBall] = useState<BallT>({
     x: CANVAS_WIDTH / 2,
     y: CANVAS_HEIGHT / 2,
@@ -38,7 +41,8 @@ export const useBall = ({ canvasRef, paddles }: IUseBallParams) => {
         y,
         velocityX,
         velocityY,
-        paddles
+        paddles,
+        isDynamicBounceEnabled
       ));
 
       return { x, y, velocityX, velocityY };

@@ -1,18 +1,15 @@
+import { useInputTracker } from "@/contexts/InputTrackerContext";
 import type { BallT, PaddlesT } from "../../types";
 
 interface IDebugBoxProps {
   ball: BallT;
   paddles: PaddlesT;
   deltaTime: number;
-  keysPressed: Record<string, boolean>;
 }
 
-export const DebugBox = ({
-  ball,
-  paddles,
-  deltaTime,
-  keysPressed,
-}: IDebugBoxProps) => {
+export const DebugBox = ({ ball, paddles, deltaTime }: IDebugBoxProps) => {
+  const keysPressed = useInputTracker();
+
   const fps = deltaTime > 0 ? (1 / deltaTime).toFixed(1) : "∞";
 
   return (

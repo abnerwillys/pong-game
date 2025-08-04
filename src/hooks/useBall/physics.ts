@@ -53,7 +53,8 @@ export const verifyPaddlesCollision = (
   y: number,
   velocityX: number,
   velocityY: number,
-  paddles: PaddlesT
+  paddles: PaddlesT,
+  isDynamicBounceEnabled: boolean
 ) => {
   const leftPaddleX = PADDLE_OFFSET_X;
   const rightPaddleX = CANVAS_WIDTH - PADDLE_OFFSET_X - paddles.width;
@@ -72,7 +73,10 @@ export const verifyPaddlesCollision = (
   ) {
     velocityX *= -1;
     x = reflectBallHorizontally(leftPaddleX, paddles.width, true);
-    velocityY += getVerticalDeflection(y, paddles.leftY, paddles.height);
+
+    if (isDynamicBounceEnabled) {
+      velocityY += getVerticalDeflection(y, paddles.leftY, paddles.height);
+    }
   }
 
   /* Right paddle collision */
@@ -89,7 +93,10 @@ export const verifyPaddlesCollision = (
   ) {
     velocityX *= -1;
     x = reflectBallHorizontally(rightPaddleX, paddles.width, false);
-    velocityY += getVerticalDeflection(y, paddles.rightY, paddles.height);
+
+    if (isDynamicBounceEnabled) {
+      velocityY += getVerticalDeflection(y, paddles.rightY, paddles.height);
+    }
   }
 
   return { x, velocityX, velocityY };
