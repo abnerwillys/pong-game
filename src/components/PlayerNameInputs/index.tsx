@@ -17,7 +17,7 @@ const InputWithIcon = ({ value, onChange }: IInputWithIconProps) => {
       />
       <div
         className="pointer-events-none absolute top-0 right-0 translate-x-1/2 -translate-y-1/2
-                   h-4 w-4 bg-amber-600 text-white rounded-full flex items-center justify-center shadow"
+                   h-5 w-5 bg-amber-600 text-white rounded-full flex items-center justify-center shadow"
         title="Editable name"
       >
         <Pencil size={10} />
