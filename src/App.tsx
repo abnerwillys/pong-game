@@ -9,7 +9,7 @@ const App = () => {
   const { isGameOver } = useGameStats();
   const { isLeaderboardVisible } = useGameSettings();
   return (
-    <div className="relative h-screen bg-gray-400 flex items-center justify-center">
+    <div className="h-screen bg-gray-400 flex items-center justify-center overflow-y-auto">
       <GameCanvas />
       {isGameOver && <GameOverOverlay />}
       {isLeaderboardVisible && <LeaderboardOverlay />}

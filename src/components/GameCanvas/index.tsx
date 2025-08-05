@@ -92,8 +92,8 @@ export const GameCanvas = () => {
 
   return (
     <div className="flex justify-center items-center h-full w-full">
-      <div className="relative w-full max-w-[900px] h-full flex flex-col justify-center items-center">
-        <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
+      <div className="w-full max-w-[900px] h-full flex flex-col items-center pt-10">
+        <div className="w-full flex justify-center items-end gap-6 z-10 mb-10">
           <DifficultyLevelsSelector />
           <ResetButton onClick={handleResetGame} />
           <SettingsDropdown />
@@ -125,11 +125,11 @@ export const GameCanvas = () => {
               boxShadow: `0 0 2px ${theme.table.paddingBorder}px ${theme.table.background}`,
             }}
           />
-
-          {isDebugInfoVisible && (
-            <DebugBox ball={ball} paddles={paddles} deltaTime={deltaTime} />
-          )}
         </div>
+
+        {isDebugInfoVisible && (
+          <DebugBox ball={ball} paddles={paddles} deltaTime={deltaTime} />
+        )}
       </div>
     </div>
   );
