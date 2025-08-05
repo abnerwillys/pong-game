@@ -99,10 +99,6 @@ export const GameCanvas = () => {
           <SettingsDropdown />
         </div>
 
-        {isDebugInfoVisible && (
-          <DebugBox ball={ball} paddles={paddles} deltaTime={deltaTime} />
-        )}
-
         <GameScore />
         <PlayerNameInputs />
         <div className="my-3">
@@ -129,6 +125,10 @@ export const GameCanvas = () => {
               boxShadow: `0 0 2px ${theme.table.paddingBorder}px ${theme.table.background}`,
             }}
           />
+
+          {isDebugInfoVisible && (
+            <DebugBox ball={ball} paddles={paddles} deltaTime={deltaTime} />
+          )}
         </div>
       </div>
     </div>
