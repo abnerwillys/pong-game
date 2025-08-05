@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { PlayerSideT } from "@/contexts/GameStatsContext";
+import { useGameStats, type PlayerSideT } from "@/contexts/GameStatsContext";
 
 interface IUseServeControllerParams {
   pauseBall: () => void;
@@ -15,6 +15,8 @@ export const useServeController = ({
   resumeBall,
   handleBallReset,
 }: IUseServeControllerParams) => {
+  const { isGameOver } = useGameStats();
+
   const [serveTo, setServeTo] = useState<PlayerSideT>("right");
   const [isOverlayVisible, setIsOverlayVisible] = useState(true);
   const [label, setLabel] = useState<ServeLabelT>("Start");
@@ -40,6 +42,7 @@ export const useServeController = ({
   }, [handleBallReset]);
 
   const handleBeginCountdown = useCallback(() => {
+    if (isGameOver) return;
     if (isCountingRef.current) return;
     isCountingRef.current = true;
 
@@ -67,12 +70,13 @@ export const useServeController = ({
         }, 1200);
       }
     }, 800);
-  }, [resumeBall]);
+  }, [isGameOver, resumeBall]);
 
   const handleBeginCountdownByShortcut = useCallback(() => {
+    if (isGameOver) return;
     if (!isOverlayVisible) return;
     handleBeginCountdown();
-  }, [handleBeginCountdown, isOverlayVisible]);
+  }, [handleBeginCountdown, isGameOver, isOverlayVisible]);
 
   /* Ensure clearInterval runs also if component unmounts during countdown */
   useEffect(() => {

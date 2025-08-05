@@ -9,3 +9,5 @@ export const PADDLE_WIDTH = 20;
 export const PADDLE_HEIGHT = 120;
 export const PADDLE_OFFSET_X = 10;
 export const PADDLE_SPEED = 0.5;
+
+export const MAX_SCORE = 2;

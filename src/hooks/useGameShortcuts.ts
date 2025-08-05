@@ -2,6 +2,7 @@ import { useGameLoop } from "./useGameLoop";
 import { useInputTracker } from "@/contexts/InputTrackerContext";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
 import { SHORTCUT_KEYS, type ShortcutKeyT } from "@/constants/shortcuts";
+import { useGameStats } from "@/contexts/GameStatsContext";
 
 /** Avoid toggles triggering when a text field (or other input) is focused for some reason. */
 const preventKeyEvents = () => {
@@ -24,6 +25,7 @@ export const useGameShortcuts = ({
   handleBeginCountdownByShortcut,
 }: IUseGameShortcutsParams) => {
   const keysPressed = useInputTracker();
+  const { isGameOver, handleStatsReset } = useGameStats();
   const {
     setIsSettingsOpen,
     setIsDebugInfoVisible,
@@ -50,8 +52,13 @@ export const useGameShortcuts = ({
       action: () => setIsDebugInfoVisible((prev) => !prev),
     },
     {
-      key: SHORTCUT_KEYS.START_SERVE,
-      action: () => handleBeginCountdownByShortcut(),
+      key: SHORTCUT_KEYS.START_PLAY_AGAIN,
+      action: () => {
+        if (isGameOver) {
+          handleStatsReset();
+        }
+        handleBeginCountdownByShortcut();
+      },
     },
   ];
 

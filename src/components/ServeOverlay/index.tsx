@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { SHORTCUT_KEYS } from "@/constants/shortcuts";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
-import type { PlayerSideT } from "@/contexts/GameStatsContext";
+import { useGameStats, type PlayerSideT } from "@/contexts/GameStatsContext";
 import type { CountdownT, ServeLabelT } from "@/hooks/useServeController";
 import NumberFlow from "@number-flow/react";
 import { ArrowRightToLine } from "lucide-react";
@@ -22,7 +22,9 @@ export const ServeOverlay = ({
   serveTo,
   onStart,
 }: IServeOverlayProps) => {
+  const { isGameOver } = useGameStats();
   const { theme } = useGameSettings();
+
   if (!visible) return null;
 
   return (
@@ -69,13 +71,14 @@ export const ServeOverlay = ({
           </p>
 
           <Button
+            disabled={isGameOver}
             onClick={onStart}
             className="p-8 bg-amber-700 hover:bg-amber-600 text-4xl tracking-wide transition-colors duration-200 ease-in-out cursor-pointer"
           >
             <span className="flex items-center gap-1">
               {label}
               <kbd className="ml-3 border px-1 text-xs rounded bg-white/10">
-                {SHORTCUT_KEYS.START_SERVE.toUpperCase()}
+                {SHORTCUT_KEYS.START_PLAY_AGAIN.toUpperCase()}
               </kbd>
             </span>
           </Button>

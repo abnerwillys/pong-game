@@ -4,25 +4,25 @@ interface IUseGameResetParams {
   handleOpenForInitialStart: () => void;
   handleBallReset: () => void;
   handlePaddlesReset: () => void;
-  handleScoreReset: () => void;
+  handleStatsReset: () => void;
 }
 
 export const useGameReset = ({
   handleOpenForInitialStart,
   handleBallReset,
   handlePaddlesReset,
-  handleScoreReset,
+  handleStatsReset,
 }: IUseGameResetParams) => {
   const handleResetGame = useCallback(() => {
     handleOpenForInitialStart();
     handleBallReset();
     handlePaddlesReset();
-    handleScoreReset();
+    handleStatsReset();
   }, [
     handleOpenForInitialStart,
     handleBallReset,
     handlePaddlesReset,
-    handleScoreReset,
+    handleStatsReset,
   ]);
 
   return { handleResetGame };

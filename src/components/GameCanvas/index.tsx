@@ -20,7 +20,7 @@ import { SettingsDropdown } from "../SettingsDropdown";
 import { ServeOverlay } from "../ServeOverlay";
 
 export const GameCanvas = () => {
-  const { handleScoreIncrement, handleScoreReset } = useGameStats();
+  const { handleScoreIncrement, handleStatsReset } = useGameStats();
   const { isDebugInfoVisible, isBallTrailEnabled, theme } = useGameSettings();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -64,7 +64,7 @@ export const GameCanvas = () => {
       handleBallReset(...args);
     },
     handlePaddlesReset,
-    handleScoreReset,
+    handleStatsReset,
   });
 
   useEffect(() => {
