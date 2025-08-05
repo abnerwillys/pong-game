@@ -1,69 +1,85 @@
-# React + TypeScript + Vite
+# 🕹️ Make Labs - Pong Game — React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<p align="center">
+  <img src="./docs/readme.png" alt="Readme picture" width="700" />
+</p>
 
-Currently, two official plugins are available:
+This is a modern Pong-style game built using **React**, **TypeScript**, and **Vite**, created as part of a coding challenge.  
+It demonstrates modular architecture, real-time canvas rendering, keyboard input tracking, state management via React Context, and developer-friendly features like a debug panel and settings toggles.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Key features include:
 
-## Expanding the ESLint configuration
+- 🌀 **Frame-rate independent game loop** using `requestAnimationFrame`
+- 🎹 **Two-player simultaneous controls**
+- 🏓 **Dynamic bounce physics**
+- 🎛️ **Developer utilities** (reset, debug box, toggle panel)
+- 🧠 **Difficulty system** with local persistence
+- 🏆 **Leaderboard** stored in `localStorage`
+- 🌪️ **Canvas trail effect** & styled game board
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## ▶️ Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+Follow these steps to run the project locally:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# 1. Clone the repository
+# Not needed if has the .zip file.
+git clone https://github.com/your-username/your-repo-name.git
+cd pong-game
+
+# 2. Install dependencies
+npm install
+
+# 3. Start the development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The app will be available at `http://localhost:5173` by default.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## ⌨️ Keyboard Shortcuts (gameplay)
+
+| Key       | Action                           |
+| --------- | -------------------------------- |
+| `W` / `S` | Move  **Left Paddle** Up / Down  |
+| `↑` / `↓` | Move  **Right Paddle** Up / Down |
+| `R`       | Reset the game                   |
+| `Enter`   | Starts the game                  |
+| `Enter`   | Starts next turn when scoring    |
+| `Enter`   | Play again after game over       |
+| `Z`       | Toggle settings panel            |
+| `T`       | Toggle ball trail                |
+| `B`       | Toggle dynamic bounce            |
+| `D`       | Toggle debug info                |
+| `L`       | Toggle leaderboard view          |
+
+ℹ️ All shortcuts are case-insensitive and work without requiring the canvas to be focused.
+
+
+---
+
+## 📒 Full Development Notes
+
+For in-depth explanations, architecture decisions, and implementation tips, check the complete notes:
+
+👉 [`/notes.md`](./notes.md)
+
+---
+
+## 🧪 Testing
+
+Automated tests are not yet included due to time constraints. See [notes](./notes.md#-why-automated-tests-were-not-included) for reasoning and next steps.
+
+---
+
+## 🛠️ Tech Stack
+
+- [React](https://reactjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Framer Motion](https://www.framer.com/motion/)
+- [Lucide Icons](https://lucide.dev/)
