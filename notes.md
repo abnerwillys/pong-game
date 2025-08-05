@@ -2,6 +2,21 @@
 
 This document contains incremental notes describing my thought process, design decisions, trade-offs, and what I would improve with more time.
 
+## 📑 Table of Contents
+
+1. [➡️ Step 1: Setup](#️-step-1-setup)
+2. [➡️ Step 2: Game Loop and Ball Movement](#️-step-2-game-loop-and-ball-movement)
+3. [➡️ Step 3: Paddles and Player Controls](#️-step-3-paddles-and-player-controls)
+4. [➡️ Step 4: Paddle Collision and Dynamic Bounce](#️-step-4-paddle-collision-and-dynamic-bounce)
+5. [➡️ Step 5: Architecture Refactor – Hooks, Utils & Constants](#️-step-5-architecture-refactor--hooks-utils--constants)
+6. [➡️ Step 6: Enhancements and Shortcuts](#️-step-6-enhancements-and-shortcuts)
+7. [➡️ Step 7: Game Flow – Score System, Countdown, Dynamic Serve & Realistic Starts](#️-step-7-game-flow--score-system-countdown-dynamic-serve--realistic-starts)
+8. [➡️ Step 8: Visual Polish — Trail, Table, UI, Score Plate](#️-step-8-visual-polish--trail-table-ui-score-plate)
+9. [➡️ Step 9: Difficulty Levels & Leaderboard Multi-Ball Planned](#️-step-9-difficulty-levels--leaderboard-multi-ball-planned)
+10. [➡️ Future Steps, Improvements & Ideas](#️-future-steps-improvements--ideas)
+11. [🧪 Why Automated Tests Were Not Included](#-why-automated-tests-were-not-included)
+12. [🧾 Glossary](#-glossary)
+
 ---
 
 ## ➡️ Step 1: Setup
@@ -401,8 +416,120 @@ Thanks to this updates, it moves the project from "working prototype" to "deligh
 
 ---
 
-## ➡️ Step 9: ??
+## ➡️ Step 9: Difficulty Levels & Leaderboard (Multi-Ball Planned)
 
+### 🎯 Goal
+Introduce scalable challenge via difficulty modes and add a persistent leaderboard to boost replayability and player engagement.
+
+### 🔹 Difficulty Selector Implemented
+A difficulty toggle was added above the settings button, letting users choose from:
+| Difficulty | Ball Speed | Paddle Size | Ball Count               |
+| ---------- | ---------- | ----------- | ------------------------ |
+| **Easy**   | Normal     | Large       | 1                        |
+| **Medium** | Faster     | Medium      | 1                        |
+| **Hard**   | Fast       | Small       | *1 (multi-ball planned)* |
+
+The difficulty affects:
+- Initial ball velocity
+- Paddle height
+- (Planned) number of balls for hard mode
+
+The current implementation includes _only one_ ball, regardless of difficulty. However, the code is structured to support multi-ball in future (see below).
+
+#### ↪️ Persistence with localStorage
+The selected difficulty is saved to `localStorage` under `pong_difficulty`, so it’s preserved across sessions:
+```ts
+localStorage.setItem("difficulty", currentDifficulty)
+```
+
+### 🔹 Leaderboard System Implemented
+A local leaderboard system tracks **total wins per player name**. When a player reaches the win threshold (e.g., 11 following table tennis rules), the game:
+- Displays a win message
+- Increments the player’s win count
+- Stores it in `localStorage` using their chosen name
+
+#### ↪️ Player Name Inputs
+Players can edit their names via inline inputs:
+```ts
+Player 1: [Abner]
+Player 2: [Make Interviewer]
+```
+
+#### ↪️ Persistence with localStorage
+The leaderboard is stored in `localStorage` under `pong_leaderboard`:
+```ts
+{
+  "Make Interviewer": 5
+  "Abner": 3,
+}
+```
+
+#### ↪️ Leaderboard Overlay
+A full-screen leaderboard view displays wins per player in a styled table with a Lucide trophy icon. It can be toggled via UI or keyboard shortcut.
+
+### 🔹 Multi-Ball (🚫 Not Implemented)
+The "Hard" difficulty mode currently displays that it includes multi-ball, but this feature is not yet implemented due to time constraints.
+
+#### ↪️  Planned Only via Config
+The idea of multi-ball is **only represented in the configuration layer** (`difficultyConfig`), where the `"hard"` level includes a `multiBall: true` flag:
+```ts
+hard: {
+    paddleHeight: 80,
+    ballSpeedX: 0.85,
+    ballSpeedY: 0.45,
+    multiBall: true /* For future */,
+  },
+```
+No changes have been made yet to the ball logic, renderer, or game loop to support multiple balls.
+
+This flag was added early as a placeholder for future expansion, but implementing it was postponed due to limited time.
+
+### 🔹 Outcome
+- Difficulty mode adds adjustable challenge and feel.
+- Leaderboard adds session-spanning progression.
+- Multi-ball is a future enhancement, with supporting architecture already in place.
+
+---
+## ➡️ Future Steps, Improvements & Ideas
+
+### 🔹 Multi-Ball Gameplay
+Implement full support for multiple balls when `multiBall: true`, including:
+- Ball array state management in `useBall`
+- Collision detection and scoring per ball
+- Trail rendering for each ball
+
+This would significantly raise the difficulty and visual intensity, especially in “Hard” mode.
+
+### 🔹 AI Opponent Mode
+Introduce a single-player mode with a basic AI-controlled paddle:
+- AI tracks ball Y position with a delay factor
+- Difficulty could be adjusted via AI reaction speed or error margin. Could be useful for solo play, testing, or demonstrating core mechanics.
+
+### 🔹 Sound Effects (SFX)
+Add simple game sounds for:
+- Paddle hit
+- Score
+- Countdown beeps
+- Win sound
+
+---
+
+## 🧪 Why Automated Tests Were Not Included
+While testing is a fundamental part of modern software development — and easier than ever to integrate with tools like Playwright, Vitest, and even AI-assisted test generation — I made a deliberate decision to **prioritize gameplay mechanics, architecture, and polish** within the limited time frame of this challenge.
+
+My goal was to showcase:
+- Deep understanding of real-time animation and canvas rendering
+- Clean modularization using hooks, contexts, and utilities
+- Scalable architecture for future features (multi-ball, AI, etc.)
+- Thoughtful UX decisions and visual details that elevate a simple game
+
+In a production-grade application or a team setting, adding tests would be my immediate next step — especially for:
+- Pure utilities (`physics.ts`, collision logic, scoring rules)
+- State hooks (`useBall`, `usePaddles`)
+- Context behavior (`GameSettingsContext`, `GameStatsContext`)
+- UI interactions and settings toggles
+
+This codebase is structured to **make testing straightforward**, with clear separations between side effects, rendering, and pure logic. I’m confident that coverage could be added with minimal friction — and would advocate for doing so if this were a real, ongoing product.
 
 ---
 
