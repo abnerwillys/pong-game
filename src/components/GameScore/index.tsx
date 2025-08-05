@@ -1,3 +1,4 @@
+import { MAX_SCORE } from "@/constants/config";
 import { useGameStats } from "@/contexts/GameStatsContext";
 import NumberFlow from "@number-flow/react";
 
@@ -31,6 +32,9 @@ export const GameScore = () => {
             <kbd className="ml-3 mr-3 px-1 border rounded bg-black/30">↑</kbd>
             <span>/</span>
             <kbd className="ml-3 px-1 border rounded bg-black/30">↓</kbd>
+          </p>
+          <p className="mt-4 font-semibold">
+            Win condition: {MAX_SCORE} points
           </p>
         </div>
       </div>
