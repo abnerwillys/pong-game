@@ -1,15 +1,25 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { DIFFICULTY_LEVELS, type DifficultyLevelT } from "@/constants/levels";
+import { SHORTCUT_KEYS } from "@/constants/shortcuts";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
 
 export const DifficultyLevelsSelector = () => {
   const { difficulty, changeDifficulty, theme } = useGameSettings();
 
   return (
-    <div className="flex flex-col items-start text-white gap-2">
-      <span className="text-xs text-white/70 uppercase tracking-wide">
-        Difficulty / Level
-      </span>
+    <div className="flex flex-col items-start text-white gap-1.5">
+      <div className="flex flex-col">
+        <span className="text-xs text-white uppercase tracking-wide">
+          Difficulty / Level
+        </span>
+        <span className="text-[10px] text-white/70 mt-0.5">
+          Press
+          <kbd className="mx-1 px-1 py-0.5 border border-white/30 rounded">
+            {SHORTCUT_KEYS.DIFFICULTY_CYCLE.toUpperCase()}
+          </kbd>{" "}
+          to cycle difficulty
+        </span>
+      </div>
 
       <ToggleGroup
         type="single"

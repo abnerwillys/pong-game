@@ -25,8 +25,8 @@ export const DIFFICULTY_CONFIG: Record<
   },
   hard: {
     paddleHeight: 80,
-    ballSpeedX: 0.75,
-    ballSpeedY: 0.4,
-    multiBall: true,
+    ballSpeedX: 0.85,
+    ballSpeedY: 0.45,
+    multiBall: true /* For future */,
   },
 };

@@ -4,7 +4,8 @@ import { useGameSettings } from "@/contexts/GameSettingsContext";
 import { SHORTCUT_KEYS, type ShortcutKeyT } from "@/constants/shortcuts";
 import { useGameStats } from "@/contexts/GameStatsContext";
 import { isUserTyping } from "@/utils/isUserTyping";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { DIFFICULTY_LEVELS } from "@/constants/levels";
 
 type ShortcutEntryT = {
   key: ShortcutKeyT;
@@ -30,7 +31,15 @@ export const useGameShortcuts = ({
     setIsBallTrailEnabled,
     setIsDynamicBounceEnabled,
     setIsLeaderboardVisible,
+    difficulty,
+    changeDifficulty,
   } = useGameSettings();
+
+  const handleCycleDifficulty = useCallback(() => {
+    const currentIndex = DIFFICULTY_LEVELS.indexOf(difficulty);
+    const nextIndex = (currentIndex + 1) % DIFFICULTY_LEVELS.length;
+    changeDifficulty(DIFFICULTY_LEVELS[nextIndex]);
+  }, [changeDifficulty, difficulty]);
 
   const shortcutMap: ShortcutEntryT[] = useMemo(
     () => [
@@ -74,9 +83,15 @@ export const useGameShortcuts = ({
         key: SHORTCUT_KEYS.LEADERBOARD,
         action: () => setIsLeaderboardVisible((prev) => !prev),
       },
+      {
+        key: SHORTCUT_KEYS.DIFFICULTY_CYCLE,
+        action: handleCycleDifficulty,
+        prevent: isLeaderboardVisible || isGameOver,
+      },
     ],
     [
       handleBeginCountdownByShortcut,
+      handleCycleDifficulty,
       handleResetGame,
       handleStatsReset,
       isGameOver,

@@ -18,6 +18,7 @@ export const SHORTCUT_KEYS = {
   DEBUG_INFO: "d",
   START_PLAY_AGAIN: "enter",
   LEADERBOARD: "l",
+  DIFFICULTY_CYCLE: "v",
 } as const;
 
 export type ShortcutKeyT = (typeof SHORTCUT_KEYS)[keyof typeof SHORTCUT_KEYS];
