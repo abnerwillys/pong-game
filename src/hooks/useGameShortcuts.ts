@@ -3,74 +3,102 @@ import { useInputTracker } from "@/contexts/InputTrackerContext";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
 import { SHORTCUT_KEYS, type ShortcutKeyT } from "@/constants/shortcuts";
 import { useGameStats } from "@/contexts/GameStatsContext";
+import { isUserTyping } from "@/utils/isUserTyping";
+import { useMemo } from "react";
 
-/** Avoid toggles triggering when a text field (or other input) is focused for some reason. */
-const preventKeyEvents = () => {
-  return (
-    document.activeElement &&
-    document.activeElement instanceof HTMLElement &&
-    document.activeElement.isContentEditable
-  );
+type ShortcutEntryT = {
+  key: ShortcutKeyT;
+  action: () => void;
+  prevent?: boolean;
 };
-
-type ShortcutEntryT = { key: ShortcutKeyT; action: () => void };
 
 interface IUseGameShortcutsParams {
   handleResetGame: () => void;
-  handleBeginCountdownByShortcut: () => void;
+  handleBeginCountdownByShortcut: (overwriteGameOver?: boolean) => void;
 }
 
 export const useGameShortcuts = ({
   handleResetGame,
   handleBeginCountdownByShortcut,
 }: IUseGameShortcutsParams) => {
-  const keysPressed = useInputTracker();
+  const keysPressedRef = useInputTracker();
   const { isGameOver, handleStatsReset } = useGameStats();
   const {
+    isLeaderboardVisible,
     setIsSettingsOpen,
     setIsDebugInfoVisible,
     setIsBallTrailEnabled,
     setIsDynamicBounceEnabled,
+    setIsLeaderboardVisible,
   } = useGameSettings();
 
-  const shortcutMap: ShortcutEntryT[] = [
-    { key: SHORTCUT_KEYS.RESET, action: () => handleResetGame() },
-    {
-      key: SHORTCUT_KEYS.SETTINGS,
-      action: () => setIsSettingsOpen((prev) => !prev),
-    },
-    {
-      key: SHORTCUT_KEYS.BALL_TRAIL,
-      action: () => setIsBallTrailEnabled((prev) => !prev),
-    },
-    {
-      key: SHORTCUT_KEYS.DYNAMIC_BOUNCE,
-      action: () => setIsDynamicBounceEnabled((prev) => !prev),
-    },
-    {
-      key: SHORTCUT_KEYS.DEBUG_INFO,
-      action: () => setIsDebugInfoVisible((prev) => !prev),
-    },
-    {
-      key: SHORTCUT_KEYS.START_PLAY_AGAIN,
-      action: () => {
-        if (isGameOver) {
-          handleStatsReset();
-        }
-        handleBeginCountdownByShortcut();
+  const shortcutMap: ShortcutEntryT[] = useMemo(
+    () => [
+      {
+        key: SHORTCUT_KEYS.RESET,
+        action: () => handleResetGame(),
+        prevent: isLeaderboardVisible || isGameOver,
       },
-    },
-  ];
+      {
+        key: SHORTCUT_KEYS.SETTINGS,
+        action: () => setIsSettingsOpen((prev) => !prev),
+        prevent: isLeaderboardVisible || isGameOver,
+      },
+      {
+        key: SHORTCUT_KEYS.BALL_TRAIL,
+        action: () => setIsBallTrailEnabled((prev) => !prev),
+        prevent: isLeaderboardVisible || isGameOver,
+      },
+      {
+        key: SHORTCUT_KEYS.DYNAMIC_BOUNCE,
+        action: () => setIsDynamicBounceEnabled((prev) => !prev),
+        prevent: isLeaderboardVisible || isGameOver,
+      },
+      {
+        key: SHORTCUT_KEYS.DEBUG_INFO,
+        action: () => setIsDebugInfoVisible((prev) => !prev),
+        prevent: isLeaderboardVisible || isGameOver,
+      },
+      {
+        key: SHORTCUT_KEYS.START_PLAY_AGAIN,
+        action: () => {
+          if (isGameOver) {
+            handleStatsReset();
+          }
+          handleBeginCountdownByShortcut(true);
+          setIsLeaderboardVisible(false);
+        },
+        prevent: isLeaderboardVisible,
+      },
+      {
+        key: SHORTCUT_KEYS.LEADERBOARD,
+        action: () => setIsLeaderboardVisible((prev) => !prev),
+      },
+    ],
+    [
+      handleBeginCountdownByShortcut,
+      handleResetGame,
+      handleStatsReset,
+      isGameOver,
+      isLeaderboardVisible,
+      setIsBallTrailEnabled,
+      setIsDebugInfoVisible,
+      setIsDynamicBounceEnabled,
+      setIsLeaderboardVisible,
+      setIsSettingsOpen,
+    ]
+  );
 
   useGameLoop(() => {
-    if (preventKeyEvents()) return;
+    if (isUserTyping()) return;
 
-    for (const { key, action } of shortcutMap) {
-      if (keysPressed.current[key]) {
+    for (const { key, action, prevent } of shortcutMap) {
+      if (prevent) continue;
+
+      if (keysPressedRef.current[key]) {
         action();
-
         /* debounce it. It will trigger only once per frame */
-        keysPressed.current[key] = false;
+        keysPressedRef.current[key] = false;
       }
     }
   });

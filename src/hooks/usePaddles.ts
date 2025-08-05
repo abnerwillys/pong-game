@@ -10,7 +10,7 @@ import { CONTROL_KEYS } from "@/constants/shortcuts";
 import { useInputTracker } from "@/contexts/InputTrackerContext";
 
 export const usePaddles = () => {
-  const keysPressed = useInputTracker();
+  const keysPressedRef = useInputTracker();
 
   const [paddles, setPaddles] = useState<PaddlesT>({
     leftY: 150,
@@ -23,14 +23,14 @@ export const usePaddles = () => {
     setPaddles((prev) => {
       let { leftY, rightY } = prev;
 
-      if (keysPressed.current[CONTROL_KEYS.LEFT_UP])
+      if (keysPressedRef.current[CONTROL_KEYS.LEFT_UP])
         leftY -= PADDLE_SPEED * delta;
-      if (keysPressed.current[CONTROL_KEYS.LEFT_DOWN])
+      if (keysPressedRef.current[CONTROL_KEYS.LEFT_DOWN])
         leftY += PADDLE_SPEED * delta;
 
-      if (keysPressed.current[CONTROL_KEYS.RIGHT_UP])
+      if (keysPressedRef.current[CONTROL_KEYS.RIGHT_UP])
         rightY -= PADDLE_SPEED * delta;
-      if (keysPressed.current[CONTROL_KEYS.RIGHT_DOWN])
+      if (keysPressedRef.current[CONTROL_KEYS.RIGHT_DOWN])
         rightY += PADDLE_SPEED * delta;
 
       leftY = Math.max(0, Math.min(CANVAS_HEIGHT - PADDLE_HEIGHT, leftY));

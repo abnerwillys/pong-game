@@ -8,12 +8,12 @@ import { GameStatsProvider } from "./contexts/GameStatsContext/index.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <GameStatsProvider>
-      <InputTrackerProvider>
-        <GameSettingsProvider>
+    <InputTrackerProvider>
+      <GameSettingsProvider>
+        <GameStatsProvider>
           <App />
-        </GameSettingsProvider>
-      </InputTrackerProvider>
-    </GameStatsProvider>
+        </GameStatsProvider>
+      </GameSettingsProvider>
+    </InputTrackerProvider>
   </StrictMode>
 );

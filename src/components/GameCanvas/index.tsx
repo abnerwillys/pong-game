@@ -18,6 +18,8 @@ import { DebugBox } from "../DebugBox";
 import { ResetButton } from "../ResetButton";
 import { SettingsDropdown } from "../SettingsDropdown";
 import { ServeOverlay } from "../ServeOverlay";
+import { PlayerNameInputs } from "../PlayerNameInputs";
+import { LeaderboardButton } from "../LeaderboardButton";
 
 export const GameCanvas = () => {
   const { handleScoreIncrement, handleStatsReset } = useGameStats();
@@ -100,6 +102,10 @@ export const GameCanvas = () => {
         )}
 
         <GameScore />
+        <PlayerNameInputs />
+        <div className="my-3">
+          <LeaderboardButton />
+        </div>
 
         <div className="relative" style={overlayStyles}>
           <ServeOverlay

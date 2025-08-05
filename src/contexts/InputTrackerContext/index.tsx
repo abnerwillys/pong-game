@@ -1,3 +1,4 @@
+import { isUserTyping } from "@/utils/isUserTyping";
 import {
   createContext,
   useContext,
@@ -12,17 +13,20 @@ const InputTrackerContext = createContext<RefObject<
 > | null>(null);
 
 export const InputTrackerProvider = ({ children }: { children: ReactNode }) => {
-  const keysPressed = useRef<Record<string, boolean>>({});
+  const keysPressedRef = useRef<Record<string, boolean>>({});
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      keysPressed.current[e.key.toLowerCase()] = true;
+      if (isUserTyping()) return;
+      keysPressedRef.current[e.key.toLowerCase()] = true;
     };
     const handleKeyUp = (e: KeyboardEvent) => {
-      keysPressed.current[e.key.toLowerCase()] = false;
+      keysPressedRef.current[e.key.toLowerCase()] = false;
     };
+
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
+
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
@@ -30,7 +34,7 @@ export const InputTrackerProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <InputTrackerContext.Provider value={keysPressed}>
+    <InputTrackerContext.Provider value={keysPressedRef}>
       {children}
     </InputTrackerContext.Provider>
   );

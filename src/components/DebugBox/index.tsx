@@ -8,7 +8,7 @@ interface IDebugBoxProps {
 }
 
 export const DebugBox = ({ ball, paddles, deltaTime }: IDebugBoxProps) => {
-  const keysPressed = useInputTracker();
+  const keysPressedRef = useInputTracker();
 
   const fps = deltaTime > 0 ? (1 / deltaTime).toFixed(1) : "∞";
 
@@ -19,7 +19,7 @@ export const DebugBox = ({ ball, paddles, deltaTime }: IDebugBoxProps) => {
       <div className="mb-2">
         <div>⌨️ Keys Pressed:</div>
         <div className="ml-2 break-all">
-          {Object.entries(keysPressed.current ?? {})
+          {Object.entries(keysPressedRef.current ?? {})
             .filter(([, v]) => v)
             .map(([k]) => k)
             .join(", ") || "None"}

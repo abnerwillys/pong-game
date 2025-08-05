@@ -18,3 +18,8 @@ export type PaddleBoundsT = {
   width: number;
   height: number;
 };
+
+export type LeaderboardEntryT = {
+  name: string;
+  wins: number;
+};

@@ -18,6 +18,12 @@ interface IGameSettingsContextData {
   setIsBallTrailEnabled: Dispatch<React.SetStateAction<boolean>>;
   isDynamicBounceEnabled: boolean;
   setIsDynamicBounceEnabled: Dispatch<React.SetStateAction<boolean>>;
+  player1Name: string;
+  setPlayer1Name: Dispatch<React.SetStateAction<string>>;
+  player2Name: string;
+  setPlayer2Name: Dispatch<React.SetStateAction<string>>;
+  isLeaderboardVisible: boolean;
+  setIsLeaderboardVisible: Dispatch<React.SetStateAction<boolean>>;
 }
 
 const GameSettingsContext = createContext<IGameSettingsContextData | null>(
@@ -30,6 +36,11 @@ export const GameSettingsProvider = ({ children }: { children: ReactNode }) => {
   const [isBallTrailEnabled, setIsBallTrailEnabled] = useState(true);
   const [isDynamicBounceEnabled, setIsDynamicBounceEnabled] = useState(true);
   const [isDebugInfoVisible, setIsDebugInfoVisible] = useState(false);
+
+  const [player1Name, setPlayer1Name] = useState("Player 1");
+  const [player2Name, setPlayer2Name] = useState("Player 2");
+
+  const [isLeaderboardVisible, setIsLeaderboardVisible] = useState(false);
 
   const theme = INITIAL_GAME_THEME;
 
@@ -44,13 +55,29 @@ export const GameSettingsProvider = ({ children }: { children: ReactNode }) => {
       setIsBallTrailEnabled,
       isDynamicBounceEnabled,
       setIsDynamicBounceEnabled,
+      player1Name,
+      player2Name,
+      setPlayer1Name,
+      setPlayer2Name,
+      isLeaderboardVisible,
+      setIsLeaderboardVisible,
     }),
     [
       theme,
-      isBallTrailEnabled,
-      isDebugInfoVisible,
-      isDynamicBounceEnabled,
       isSettingsOpen,
+      setIsSettingsOpen,
+      isDebugInfoVisible,
+      setIsDebugInfoVisible,
+      isBallTrailEnabled,
+      setIsBallTrailEnabled,
+      isDynamicBounceEnabled,
+      setIsDynamicBounceEnabled,
+      player1Name,
+      player2Name,
+      setPlayer1Name,
+      setPlayer2Name,
+      isLeaderboardVisible,
+      setIsLeaderboardVisible,
     ]
   );
 

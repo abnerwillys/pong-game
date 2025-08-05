@@ -41,42 +41,48 @@ export const useServeController = ({
     setIsOverlayVisible(true);
   }, [handleBallReset]);
 
-  const handleBeginCountdown = useCallback(() => {
-    if (isGameOver) return;
-    if (isCountingRef.current) return;
-    isCountingRef.current = true;
+  const handleBeginCountdown = useCallback(
+    (overwriteGameOver = false) => {
+      if (isGameOver && !overwriteGameOver) return;
+      if (isCountingRef.current) return;
+      isCountingRef.current = true;
 
-    let n = 3;
-    setCountdown(n);
+      let n = 3;
+      setCountdown(n);
 
-    const intervalId = setInterval(() => {
-      if (!isCountingRef.current) {
-        clearInterval(intervalId);
-        return;
-      }
+      const intervalId = setInterval(() => {
+        if (!isCountingRef.current) {
+          clearInterval(intervalId);
+          return;
+        }
 
-      n -= 1;
-      if (n >= 1) {
-        setCountdown(n);
-      } else {
-        setCountdown("GO!");
-        clearInterval(intervalId);
+        n -= 1;
+        if (n >= 1) {
+          setCountdown(n);
+        } else {
+          setCountdown("GO!");
+          clearInterval(intervalId);
 
-        setTimeout(() => {
-          setCountdown(null);
-          isCountingRef.current = false;
-          setIsOverlayVisible(false);
-          resumeBall();
-        }, 1200);
-      }
-    }, 800);
-  }, [isGameOver, resumeBall]);
+          setTimeout(() => {
+            setCountdown(null);
+            isCountingRef.current = false;
+            setIsOverlayVisible(false);
+            resumeBall();
+          }, 1200);
+        }
+      }, 800);
+    },
+    [isGameOver, resumeBall]
+  );
 
-  const handleBeginCountdownByShortcut = useCallback(() => {
-    if (isGameOver) return;
-    if (!isOverlayVisible) return;
-    handleBeginCountdown();
-  }, [handleBeginCountdown, isGameOver, isOverlayVisible]);
+  const handleBeginCountdownByShortcut = useCallback(
+    (overwriteGameOver = false) => {
+      if (isGameOver && !overwriteGameOver) return;
+      if (!isOverlayVisible) return;
+      handleBeginCountdown(overwriteGameOver);
+    },
+    [handleBeginCountdown, isGameOver, isOverlayVisible]
+  );
 
   /* Ensure clearInterval runs also if component unmounts during countdown */
   useEffect(() => {
