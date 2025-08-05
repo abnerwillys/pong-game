@@ -1,3 +1,4 @@
+import { INITIAL_GAME_THEME, type GameThemeT } from "@/constants/theme";
 import {
   createContext,
   useContext,
@@ -8,6 +9,7 @@ import {
 } from "react";
 
 interface IGameSettingsContextData {
+  theme: GameThemeT;
   isSettingsOpen: boolean;
   setIsSettingsOpen: Dispatch<React.SetStateAction<boolean>>;
   isDebugInfoVisible: boolean;
@@ -29,8 +31,11 @@ export const GameSettingsProvider = ({ children }: { children: ReactNode }) => {
   const [isDynamicBounceEnabled, setIsDynamicBounceEnabled] = useState(true);
   const [isDebugInfoVisible, setIsDebugInfoVisible] = useState(false);
 
+  const theme = INITIAL_GAME_THEME;
+
   const value = useMemo(
     () => ({
+      theme,
       isSettingsOpen,
       setIsSettingsOpen,
       isDebugInfoVisible,
@@ -41,6 +46,7 @@ export const GameSettingsProvider = ({ children }: { children: ReactNode }) => {
       setIsDynamicBounceEnabled,
     }),
     [
+      theme,
       isBallTrailEnabled,
       isDebugInfoVisible,
       isDynamicBounceEnabled,

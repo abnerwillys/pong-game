@@ -261,7 +261,6 @@ Future: Additional shortcuts (e.g., speed multiplier, pause, or AI mode) can be 
 
 This kind of modularization mirrors common architecture in game engines (e.g., Unity's component system, ECS patterns), promoting separation of concerns and testability.
 
-
 ---
 
 ## ➡️ Step 7: Game Flow – Score System, Countdown, Dynamic Serve & Realistic Starts
@@ -333,6 +332,77 @@ Together, these changes elevate the game from a physics sandbox into a structure
 
 ### 🔹 Diagram updated
 <img src="./docs/images/step7_diagram.png" alt="Game loop and paddle input diagram" width="700" />
+
+---
+
+## ➡️ Step 8: Visual Polish — Trail, Table, UI, Score Plate
+
+### 🎯 Goal
+Enhance visual clarity, feedback, and style to make the game feel finished, dynamic, and enjoyable to look at — even without major 3D or sound effects.
+
+### 🔹 Ball Trail (with Distance & Opacity Controls)
+The ball now leaves behind a smooth fading trail using a circular buffer (`ballTrailRef`) that records past positions:
+- Only the last `N` positions (from theme) are rendered.
+- Each trail circle fades using the `theme.trail.opacity` setting.
+- A new setting `theme.trail.spacing` allows controlling the **distance between each trail dot**, offering precision tuning for visual flow.
+
+This effect:
+- Emphasizes ball speed and direction.
+- Improves gameplay feedback without affecting physics.
+- Adds a subtle "juice" layer common in arcade games.
+
+The trail is toggleable via UI or the keyboard shortcut (`t`), making it easy to enable for visual flair or disable for clean debugging.
+
+
+### 🔹 Table Styling & Renderer Refactor
+I moved all table styling into a centralized `theme.table` object with:
+- background: main green hue
+- borderColor / borderWidth: white outer lines
+- paddingBorder: small inner padding to mimic a real table
+
+In addition, I extracted `renderBall`, `renderTrail`, `renderPaddles`, and `renderNet` into isolated drawing helpers, improving modularity and enabling easier future testing or replacement.
+
+**New visual additions**:
+- **Center Net**: White dashed vertical line in the middle of the table
+- **Center Line**: Thin horizontal white line across the middle (table design detail)
+- **Paddle Border Radius**: Slightly rounded corners to reduce sharpness
+
+This brings the visual design closer to table tennis aesthetics while still fitting within the retro Pong feel.
+
+### 🔹 Score Display with Shortcut Hints
+I redesigned the score counter (`<GameScore />`) as a **rounded scoreboard plate**, visually inspired by real-world sports overlays.
+
+I added also a keyboard control legend:
+```ts
+Player 1 (Left):  [W] / [S]  
+Player 2 (Right): [↑] / [↓]
+```
+This solves the issue where players didn’t know how to move paddles, ensuring that every play session is intuitive without needing onboarding.
+
+
+### 🔹 Responsive Layering & Overlay Alignment
+I fixed previous layout issues where overlays (like the serve countdown) stretched across the full screen.
+- All overlays are now constrained to the canvas using a wrapper (`relative` container)
+- Overlays are aligned above the canvas (`z-20`) but **do not block UI outside** (`pointer-events-none`)
+- Interactive elements (like Start button) are wrapped in `pointer-events-auto` for correct targeting
+
+This creates a **pixel-perfect overlay system** with minimal visual bugs and full control over positioning.
+
+### 🔹 Outcome
+- The game now `feels polished`, not just functional.
+- Players see real-time feedback via the trail and paddle collisions.
+- UI hints make it `self-explanatory and accessible`.
+- Visual hierarchy is respected (no overlays misaligned or blocking canvas).
+
+Thanks to this updates, it moves the project from "working prototype" to "delightful game" giving the felling of a really nice game to play. 
+
+### 🔹 Diagram update 
+<img src="./docs/images/step8_diagram.png" alt="Game loop and paddle input diagram" width="800" />
+
+---
+
+## ➡️ Step 9: ??
+
 
 ---
 

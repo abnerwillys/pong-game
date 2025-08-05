@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import { useGameStats } from "@/contexts/GameStatsContext";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
@@ -21,7 +21,7 @@ import { ServeOverlay } from "../ServeOverlay";
 
 export const GameCanvas = () => {
   const { handleScoreIncrement, handleScoreReset } = useGameStats();
-  const { isDebugInfoVisible, isBallTrailEnabled } = useGameSettings();
+  const { isDebugInfoVisible, isBallTrailEnabled, theme } = useGameSettings();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [deltaTime, setDeltaTime] = useState(0);
@@ -81,11 +81,15 @@ export const GameCanvas = () => {
   useCanvasRenderer({ canvasRef, ball, ballTrailRef, paddles });
   useGameShortcuts({ handleResetGame, handleBeginCountdownByShortcut });
 
+  const overlayStyles: CSSProperties = {
+    width: CANVAS_WIDTH + theme.table.borderWidth + theme.table.paddingBorder,
+    height: CANVAS_HEIGHT + theme.table.borderWidth + theme.table.paddingBorder,
+    boxSizing: "content-box",
+  };
+
   return (
     <div className="flex justify-center items-center h-full w-full">
       <div className="relative w-full max-w-[900px] h-full flex flex-col justify-center items-center">
-        <GameScore />
-
         <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
           <ResetButton onClick={handleResetGame} />
           <SettingsDropdown />
@@ -95,20 +99,29 @@ export const GameCanvas = () => {
           <DebugBox ball={ball} paddles={paddles} deltaTime={deltaTime} />
         )}
 
-        <ServeOverlay
-          visible={isOverlayVisible}
-          label={label}
-          countdown={countdown}
-          serveTo={serveTo}
-          onStart={handleBeginCountdown}
-        />
+        <GameScore />
 
-        <canvas
-          ref={canvasRef}
-          width={CANVAS_WIDTH}
-          height={CANVAS_HEIGHT}
-          className="mt-16 bg-black border-4 border-white rounded"
-        />
+        <div className="relative" style={overlayStyles}>
+          <ServeOverlay
+            visible={isOverlayVisible}
+            label={label}
+            countdown={countdown}
+            serveTo={serveTo}
+            onStart={handleBeginCountdown}
+          />
+
+          <canvas
+            ref={canvasRef}
+            width={CANVAS_WIDTH}
+            height={CANVAS_HEIGHT}
+            style={{
+              backgroundColor: theme.table.background,
+              border: `${theme.table.borderWidth}px solid ${theme.table.borderColor}`,
+              borderRadius: "0.2rem",
+              boxShadow: `0 0 2px ${theme.table.paddingBorder}px ${theme.table.background}`,
+            }}
+          />
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,54 @@
+%% https://www.mermaidchart.com/play#pako:eNp1VM1uEzEQfhUTjtDyk0LbVEIKrVpVtLRqw2mzB8c7m1h17MX2Ji2IK1ckJM68BrwOLwCPwPhnzW66XLKeme-b_8nHAVMFDEaDuabVgkyOppKQq_FxpuF9DcaOJV9Sy5U81nQJOdnaekXOlKqy2sAJatybrLldkAKEpflUOgemngV_08Gf799-_v7xhZzKqrZkoim7AU0OlbRwa6cDhyZo5PYN3JnsRKgZFeQG7gq1lk_wW1dEcGNBgjZ5F-2T8TRMxvtv3P_6_NX5MJcajIHC80AWITmfckN1iuTrXK3gkhaFAO8yPkldFdRCiJ6w1wulLautaTqRFIQy17CA_6f1JLCWyznW6QhRIFbN5wL68XoF4-DOxfGy651WQoDeNpZqe6hqaV278o36XDmvqRCO6b6dQlq1hlAWTU3xBiyp_JsYp08M7ybBvXOHnTl1g_RltLx5_BW2H7TL5JDKFTVBBp0ndHIdTMFPeLfUb8HiasZX3guZ0JmAMy4hAr18zgun6me40Lg6XERGkv8PbyH7QU0rdVuK3el08ggsMHvNlIbMuF-8JKfBmROFJ6NKMsMJF2FsLbRnv_MjDexmEbGbZntBJUb0hlPJNCxBhn61GN5DosSbzDYVZMUpafvudYOLu_br2benIZmLCuSxwsHd2kmtm3VNxFDP6cUKtKB3mddFgRgEGcKaTSePSIVqbDiXpQo71DqVOAZTLyHOyj3DlmJXTy4e5M16NRhPcX8sY4m3mGlMWC35B3AqToXXRhIT1JgjKDGd0J-SCzF6WEI5ZLuPDdZ8AyhSxp69ONggLCslcRCRAk_L5yUkynBvVpR7XYpQc86aCAx2y2GCA9vZ29_vwgtN1w16WO6ULxN6n9EhLQ9CCZsjHo1GsRhnvT9AtPtEUqPjXDwv1hSZ3fNGgEsp2lLYbrx02S30xinfs6QT7bXcU8b7S_rBp78fHoB0
+
+graph TD
+  RAF[requestAnimationFrame] --> Loop[useGameLoop with delta]
+
+  subgraph "🕹️ Input Tracker Context"
+    InitKeys[Global keydown/keyup listeners]
+    InitKeys --> Keys[useInputTracker → keysPressed]
+  end
+
+  Loop --> Keys
+  Keys --> MovePaddles[usePaddles updates]
+  Keys --> Shortcuts[useGameShortcuts actions]
+  Shortcuts --> Settings[GameSettings toggles]
+  Shortcuts --> ServeActions[useServeController.startCountdown]
+
+  Loop --> MoveBall[useBall updates]
+  MovePaddles --> StatePaddles[set paddle state]
+  MoveBall --> StateBall[set ball state]
+
+  StatePaddles --> Render[useCanvasRenderer]
+  StateBall --> Render
+
+  Render --> RenderNet[renderNet]
+  Render --> RenderTableLine[renderTableMidLine]
+  Render --> RenderBallTrail[renderBallTrail]
+  Render --> RenderBall[renderBall]
+  Render --> RenderPaddles[renderPaddles]
+
+  MoveBall --> DetectScore[score detection out of bounds]
+  DetectScore --> UpdateScore[useGameStats.handleScoreIncrement]
+  UpdateScore --> GameStatsContext[GameStatsContext via useGameStats]
+  UpdateScore --> ShowServe[useServeController.handleOpenForNextTurn]
+
+  ShowServe --> UIOverlay[ServeOverlay shows countdown + player info]
+  ServeActions --> ResumeBall[resume ball on GO!]
+
+  ResumeBall --> InitAngle[randomizeInitialAngle]
+
+  classDef context fill:#fef3c7,stroke:#facc15;
+  classDef component fill:#e0f2fe,stroke:#38bdf8;
+  classDef logic fill:#fce7f3,stroke:#ec4899;
+  classDef draw fill:#f3f4f6,stroke:#9ca3af;
+
+  GameStatsContext:::context
+  useServeController:::logic
+  ServeOverlay:::component
+  useCanvasRenderer:::draw
+  useGameStats:::context
+  RenderNet:::draw
+  RenderTableLine:::draw
+  RenderBallTrail:::draw
+  RenderBall:::draw
+  RenderPaddles:::draw
