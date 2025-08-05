@@ -6,7 +6,7 @@ import {
   CANVAS_HEIGHT,
 } from "../../constants/config";
 
-const isPaddleCollision = (
+export const isPaddleCollision = (
   ballX: number,
   ballY: number,
   paddleX: number,
@@ -22,7 +22,7 @@ const isPaddleCollision = (
   );
 };
 
-const getVerticalDeflection = (
+export const getVerticalDeflection = (
   ballY: number,
   paddleY: number,
   paddleHeight: number,
@@ -33,7 +33,7 @@ const getVerticalDeflection = (
   return normalized * factor;
 };
 
-const reflectBallHorizontally = (
+export const reflectBallHorizontally = (
   paddleX: number,
   paddleWidth: number,
   isLeftSide: boolean
