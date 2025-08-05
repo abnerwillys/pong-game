@@ -20,6 +20,7 @@ import { SettingsDropdown } from "../SettingsDropdown";
 import { ServeOverlay } from "../ServeOverlay";
 import { PlayerNameInputs } from "../PlayerNameInputs";
 import { LeaderboardButton } from "../LeaderboardButton";
+import { DifficultyLevelsSelector } from "../DifficultyLevelsSelector";
 
 export const GameCanvas = () => {
   const { handleScoreIncrement, handleStatsReset } = useGameStats();
@@ -93,6 +94,7 @@ export const GameCanvas = () => {
     <div className="flex justify-center items-center h-full w-full">
       <div className="relative w-full max-w-[900px] h-full flex flex-col justify-center items-center">
         <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
+          <DifficultyLevelsSelector />
           <ResetButton onClick={handleResetGame} />
           <SettingsDropdown />
         </div>

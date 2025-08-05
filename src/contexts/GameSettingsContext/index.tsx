@@ -1,4 +1,6 @@
+import { DIFFICULTY_CONFIG, type DifficultyLevelT } from "@/constants/levels";
 import { INITIAL_GAME_THEME, type GameThemeT } from "@/constants/theme";
+import { useDifficultyLevel } from "@/hooks/useDifficultyLevel";
 import {
   createContext,
   useContext,
@@ -24,6 +26,9 @@ interface IGameSettingsContextData {
   setPlayer2Name: Dispatch<React.SetStateAction<string>>;
   isLeaderboardVisible: boolean;
   setIsLeaderboardVisible: Dispatch<React.SetStateAction<boolean>>;
+  difficulty: DifficultyLevelT;
+  difficultyConfig: (typeof DIFFICULTY_CONFIG)[DifficultyLevelT];
+  changeDifficulty: (level: DifficultyLevelT) => void;
 }
 
 const GameSettingsContext = createContext<IGameSettingsContextData | null>(
@@ -31,6 +36,8 @@ const GameSettingsContext = createContext<IGameSettingsContextData | null>(
 );
 
 export const GameSettingsProvider = ({ children }: { children: ReactNode }) => {
+  const { difficulty, changeDifficulty } = useDifficultyLevel();
+
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const [isBallTrailEnabled, setIsBallTrailEnabled] = useState(true);
@@ -43,6 +50,11 @@ export const GameSettingsProvider = ({ children }: { children: ReactNode }) => {
   const [isLeaderboardVisible, setIsLeaderboardVisible] = useState(false);
 
   const theme = INITIAL_GAME_THEME;
+
+  const difficultyConfig = useMemo(
+    () => DIFFICULTY_CONFIG[difficulty],
+    [difficulty]
+  );
 
   const value = useMemo(
     () => ({
@@ -61,23 +73,22 @@ export const GameSettingsProvider = ({ children }: { children: ReactNode }) => {
       setPlayer2Name,
       isLeaderboardVisible,
       setIsLeaderboardVisible,
+      difficulty,
+      difficultyConfig,
+      changeDifficulty,
     }),
     [
       theme,
       isSettingsOpen,
-      setIsSettingsOpen,
       isDebugInfoVisible,
-      setIsDebugInfoVisible,
       isBallTrailEnabled,
-      setIsBallTrailEnabled,
       isDynamicBounceEnabled,
-      setIsDynamicBounceEnabled,
       player1Name,
       player2Name,
-      setPlayer1Name,
-      setPlayer2Name,
       isLeaderboardVisible,
-      setIsLeaderboardVisible,
+      difficulty,
+      difficultyConfig,
+      changeDifficulty,
     ]
   );
 

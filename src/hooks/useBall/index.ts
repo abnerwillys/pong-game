@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { BallT, PaddlesT } from "@/types";
-import {
-  BALL_INITIAL_SPEED_X,
-  BALL_INITIAL_SPEED_Y,
-  CANVAS_WIDTH,
-  CANVAS_HEIGHT,
-} from "@/constants/config";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/constants/config";
 import { verifyPaddlesCollision, verifyWallCollision } from "./physics";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
 import type { PlayerSideT } from "@/contexts/GameStatsContext";
@@ -16,16 +11,19 @@ interface IUseBallParams {
   onScore: (side: PlayerSideT) => void;
 }
 
-const handleBallStateReset = (serveTo: PlayerSideT): BallT => {
+const handleBallStateReset = (
+  serveTo: PlayerSideT,
+  speedX: number,
+  speedY: number
+): BallT => {
   const angleDeg = Math.random() * 60 - 30; /* -30° to +30° */
   const angleRad = (angleDeg * Math.PI) / 180;
-  const speed = BALL_INITIAL_SPEED_X;
 
   const velocityX =
     serveTo === "left"
-      ? -Math.abs(Math.cos(angleRad) * speed)
-      : Math.abs(Math.cos(angleRad) * speed);
-  const velocityY = Math.sin(angleRad) * BALL_INITIAL_SPEED_Y;
+      ? -Math.abs(Math.cos(angleRad) * speedX)
+      : Math.abs(Math.cos(angleRad) * speedX);
+  const velocityY = Math.sin(angleRad) * speedY;
 
   return {
     x: CANVAS_WIDTH / 2,
@@ -39,9 +37,15 @@ const serveTowardConcedingSide = (scorer: PlayerSideT): PlayerSideT =>
   scorer === "right" ? "left" : "right";
 
 export const useBall = ({ canvasRef, paddles, onScore }: IUseBallParams) => {
-  const { isDynamicBounceEnabled } = useGameSettings();
+  const { isDynamicBounceEnabled, difficultyConfig } = useGameSettings();
 
-  const [ball, setBall] = useState<BallT>(handleBallStateReset("right"));
+  const [ball, setBall] = useState<BallT>(
+    handleBallStateReset(
+      "right",
+      difficultyConfig.ballSpeedX,
+      difficultyConfig.ballSpeedY
+    )
+  );
 
   const isPausedRef = useRef(false);
   const hasScoredRef = useRef(false);
@@ -55,11 +59,20 @@ export const useBall = ({ canvasRef, paddles, onScore }: IUseBallParams) => {
     isPausedRef.current = false;
   }, []);
 
-  const handleBallReset = useCallback((serveTo: PlayerSideT = "right") => {
-    hasScoredRef.current = false;
-    scoredSideRef.current = null;
-    setBall(handleBallStateReset(serveTo));
-  }, []);
+  const handleBallReset = useCallback(
+    (serveTo: PlayerSideT = "right") => {
+      hasScoredRef.current = false;
+      scoredSideRef.current = null;
+      setBall(
+        handleBallStateReset(
+          serveTo,
+          difficultyConfig.ballSpeedX,
+          difficultyConfig.ballSpeedY
+        )
+      );
+    },
+    [difficultyConfig.ballSpeedX, difficultyConfig.ballSpeedY]
+  );
 
   const handleBallUpdate = useCallback(
     (delta: number) => {
